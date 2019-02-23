@@ -1,0 +1,8 @@
+inst/doc/*.html
+inst/doc/*.md
+inst/doc/*.Rmd
+*.Rout
+.Rproj.user
+.Rhistory
+.RData
+.DS_Store
