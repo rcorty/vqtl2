@@ -11,8 +11,9 @@
 #' @param model Indicates whether to use a normal model (least
 #'     squares) or binary model (logistic regression) for the phenotype.
 #'     If `model="binary"`, the phenotypes must have values in \eqn{[0, 1]}.
-#' @param cores Number of CPU cores to use, for parallel calculations.
-#' (If `0`, use [parallel::detectCores()].)
+#' @param num_cores Number of CPU cores to use, for parallel calculations.
+#'     (If `0`, use [parallel::detectCores() - 1].)
+#'
 #' @param ... additional optional arguments
 #'
 #' @return results of the scan
@@ -25,7 +26,7 @@ scan1var <- function(pheno_name,
                      non_genetic_data,
                      model = c("normal", "binary"),
                      weights = NULL,
-                     cores = 1,
+                     num_cores = 1,
                      ...)
 {
 
@@ -42,16 +43,42 @@ scan1var <- function(pheno_name,
                                data = non_genetic_data,
                                family = family)
 
-  dplyr::bind_rows(
-    lapply(X = alleleprobs,
-           FUN = scan1var_onechr,
-           pheno_name = pheno_name,
-           mean_covar_names = mean_covar_names,
-           var_covar_names = var_covar_names,
-           non_genetic_data = non_genetic_data,
-           family = family,
-           null_fit = null_fit)
-  )
+  num_cores <- ifelse(test = num_cores == 0,
+                      yes = parallel::detectCores() - 1,
+                      no = num_cores)
+
+  if (num_cores == 1) {
+    result <- dplyr::bind_rows(
+      lapply(X = alleleprobs,
+             FUN = scan1var_onechr,
+             pheno_name = pheno_name,
+             mean_covar_names = mean_covar_names,
+             var_covar_names = var_covar_names,
+             non_genetic_data = non_genetic_data,
+             family = family,
+             null_fit = null_fit)
+    )
+  } else {
+
+    # would have preferred to use mclapply but it didn't work
+    cl <- parallel::makeCluster(spec = num_cores)
+    doParallel::registerDoParallel(cl = cl)
+    `%dopar%` <- foreach::`%dopar%`   # necessary to get the loop to parse
+    result <-  foreach::foreach(i = 1:3,
+                                .combine = dplyr::bind_rows) %dopar% {
+      lapply(X = alleleprobs,
+             FUN = scan1var_onechr,
+             pheno_name = pheno_name,
+             mean_covar_names = mean_covar_names,
+             var_covar_names = var_covar_names,
+             non_genetic_data = non_genetic_data,
+             family = family,
+             null_fit = null_fit)
+    }
+    parallel::stopCluster(cl = cl)
+  }
+
+  return(result)
 }
 
 

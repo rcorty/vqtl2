@@ -15,10 +15,21 @@ plot(out, map, lodcolumn = 1, col="slateblue")
 plot(out, map, lodcolumn = 2, col="violetred", add=TRUE)
 legend("topleft", lwd=2, col=c("slateblue", "violetred"), colnames(out), bg="gray90")
 
-s1v_iron <- scan1var(pheno_name = 'liver',
-                     mean_covar_names = 'spleen',
-                     alleleprobs = apr,
-                     non_genetic_data = as.data.frame(iron$pheno))
+system.time(
+  s1v_iron <- scan1var(pheno_name = 'liver',
+                       mean_covar_names = 'spleen',
+                       alleleprobs = apr,
+                       non_genetic_data = as.data.frame(iron$pheno),
+                       num_cores = 1)
+)
+
+system.time(
+  s1v_iron <- scan1var(pheno_name = 'liver',
+                       mean_covar_names = 'spleen',
+                       alleleprobs = apr,
+                       non_genetic_data = as.data.frame(iron$pheno),
+                       num_cores = 3)
+)
 
 # do population
 gatti_file <- 'https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do.zip'

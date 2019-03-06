@@ -6,7 +6,7 @@
 \usage{
 scan1var(pheno_name, mean_covar_names = NULL, var_covar_names = NULL,
   alleleprobs, non_genetic_data, model = c("normal", "binary"),
-  weights = NULL, cores = 1, ...)
+  weights = NULL, num_cores = 1, ...)
 }
 \arguments{
 \item{alleleprobs}{Genotype probabilities as calculated by
@@ -20,8 +20,8 @@ If `model="binary"`, the phenotypes must have values in \eqn{[0, 1]}.}
 individuals. As with the other inputs, it must have `names`
 for individual identifiers.}
 
-\item{cores}{Number of CPU cores to use, for parallel calculations.
-(If `0`, use [parallel::detectCores()].)}
+\item{num_cores}{Number of CPU cores to use, for parallel calculations.
+(If `0`, use [parallel::detectCores() - 1].)}
 
 \item{...}{additional optional arguments}
 

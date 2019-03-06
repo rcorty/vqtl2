@@ -15,4 +15,7 @@ Imports:
     qtl2,
     dplyr,
     tibble,
-    dglm
+    dglm,
+    parallel,
+    doParallel,
+    foreach
