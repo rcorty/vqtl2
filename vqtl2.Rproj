@@ -5,13 +5,14 @@ SaveWorkspace: Default
 AlwaysSaveHistory: Default
 
 EnableCodeIndexing: Yes
-UseSpacesForTab: No
-NumSpacesForTab: 4
+UseSpacesForTab: Yes
+NumSpacesForTab: 2
 Encoding: UTF-8
 
 RnwWeave: knitr
 LaTeX: pdfLaTeX
 
+AutoAppendNewline: Yes
 StripTrailingWhitespace: Yes
 
 BuildType: Package
