@@ -156,3 +156,9 @@ setup_cluster <-
 		}
 		cores
 	}
+
+is_cluster <-
+  function(cores)
+  {
+    "cluster" %in% class(cores) && "SOCKcluster" %in% class(cores)
+  }

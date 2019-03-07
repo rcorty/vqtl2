@@ -5,8 +5,9 @@ Version: 0.1.1
 Author: Robert W. Corty <rcorty@gmail.com
 Maintainer: Robert W. Corty <rcorty@gmail.com>
 Description: Update to package 'vqtl' as described 
-  in Corty and Valdar (2019) <doi:10.1534/g3.118.200642>.
-License: GPL3
+  in Corty and Valdar (2019) <doi:10.1534/g3.118.200642>,
+  now compatible with qtl2.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Suggests: 

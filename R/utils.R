@@ -31,48 +31,48 @@ fit_hglm <- function(mf, df, data, glm_family) {#, obs_weights) {
   # hglm::hglm2(meanmodel = mf, disp = df, data = data, calc.like = TRUE, family = glm_family)#, weights = obs_weights)
 }
 
-fit_dhglm <- function(mf, df, data) {
-  stop('dhglm not yet implemented.')
-}
+# fit_dhglm <- function(mf, df, data) {
+#   stop('dhglm not yet implemented.')
+# }
 
-fit_model <- function(formulae,
-                      data,
-                      mean = c('alt', 'null'),
-                      var = c('alt', 'null'),
-                      model = c('dglm', 'hglm', 'dhglm'),
-                      glm_family = c('gaussian', 'poisson'),
-                      permute_what = c('none', 'mean', 'var', 'both'),
-                      the.perm = seq(from = 1, to = nrow(data)),
-                      obs_weights = rep(1, nrow(data))) {
-
-  mean <- match.arg(arg = mean)
-  var <- match.arg(arg = var)
-  model <- match.arg(arg = model)
-  glm_family <- match.arg(arg = glm_family)
-  permute_what <- match.arg(arg = permute_what)
-
-  mf <- switch(mean, alt = formulae[['mean.alt.formula']], null = formulae[['mean.null.formula']])
-  vf <- switch(var, alt = formulae[['var.alt.formula']], null = formulae[['var.null.formula']])
-
-  fit_model <- switch(EXPR = model,
-                      dglm = fit_dglm,
-                      hglm = fit_hglm,
-                      dhglm = fit_dhglm)
-
-  glm_family <- switch(EXPR = glm_family,
-                       gaussian = stats::gaussian,
-                       poisson = stats::poisson)
-
-  data <- switch(EXPR = permute_what,
-                 none = data,
-                 mean = permute.mean.QTL.terms_(df = data, the.perm = the.perm),
-                 var = permute.var.QTL.terms_(df = data, the.perm = the.perm),
-                 both = permute.QTL.terms_(df = data, the.perm = the.perm))
-
-  tryNA(fit_model(mf = mf, df =  vf, data = data, glm_family = glm_family))#, obs_weights = obs_weights)
-  # tryNA(do.call(what = fit_model,
-  # args = list(mf = mf, df =  vf, data = data, glm_family = glm_family, weights = obs_weights)))
-}
+# fit_model <- function(formulae,
+#                       data,
+#                       mean = c('alt', 'null'),
+#                       var = c('alt', 'null'),
+#                       model = c('dglm', 'hglm', 'dhglm'),
+#                       glm_family = c('gaussian', 'poisson'),
+#                       permute_what = c('none', 'mean', 'var', 'both'),
+#                       the.perm = seq(from = 1, to = nrow(data)),
+#                       obs_weights = rep(1, nrow(data))) {
+#
+#   mean <- match.arg(arg = mean)
+#   var <- match.arg(arg = var)
+#   model <- match.arg(arg = model)
+#   glm_family <- match.arg(arg = glm_family)
+#   permute_what <- match.arg(arg = permute_what)
+#
+#   mf <- switch(mean, alt = formulae[['mean.alt.formula']], null = formulae[['mean.null.formula']])
+#   vf <- switch(var, alt = formulae[['var.alt.formula']], null = formulae[['var.null.formula']])
+#
+#   fit_model <- switch(EXPR = model,
+#                       dglm = fit_dglm,
+#                       hglm = fit_hglm,
+#                       dhglm = fit_dhglm)
+#
+#   glm_family <- switch(EXPR = glm_family,
+#                        gaussian = stats::gaussian,
+#                        poisson = stats::poisson)
+#
+#   data <- switch(EXPR = permute_what,
+#                  none = data,
+#                  mean = permute.mean.QTL.terms_(df = data, the.perm = the.perm),
+#                  var = permute.var.QTL.terms_(df = data, the.perm = the.perm),
+#                  both = permute.QTL.terms_(df = data, the.perm = the.perm))
+#
+#   tryNA(fit_model(mf = mf, df =  vf, data = data, glm_family = glm_family))#, obs_weights = obs_weights)
+#   # tryNA(do.call(what = fit_model,
+#   # args = list(mf = mf, df =  vf, data = data, glm_family = glm_family, weights = obs_weights)))
+# }
 
 
 
@@ -124,7 +124,7 @@ LRT_from_LLs <- function(null_ll, alt_ll) {
 
 dof <- function(f) {
   if (inherits(x = f, what = 'dglm')) {
-    length(coef(f)) + length(coef(f$dispersion.fit)) - 2L
+    length(stats::coef(f)) + length(stats::coef(f$dispersion.fit)) - 2L
   }
 }
 
@@ -143,7 +143,7 @@ make_formula <- function(response_name = NULL,
     covar_names <- 1
   }
 
-  formula(
+  stats::formula(
     paste(response_name,
           '~',
           paste(

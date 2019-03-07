@@ -1,18 +1,19 @@
 #' Mean-Variance genome scan with a single-QTL model
 #'
+#' @param pheno_name name of the phenotype to scan
+#' @param mean_covar_names names of the mean covariates
+#' @param var_covar_names names of the variance covariates
 #' @param alleleprobs Genotype probabilities as calculated by
 #'     [qtl::calc_genoprob()].
-#' @param pheno A data.frame of phenotypes, individuals x phenotypes.
-#' @param mean_addcovar An optional data.frame of additive covariates.
-#' @param var_addcovar An optional data.frame of additive covariates.
-#' @param weights An optional numeric vector of positive weights for the
-#' individuals. As with the other inputs, it must have `names`
-#' for individual identifiers.
+#' @param non_genetic_data phenotype and covararite data.frame
 #' @param model Indicates whether to use a normal model (least
 #'     squares) or binary model (logistic regression) for the phenotype.
 #'     If `model="binary"`, the phenotypes must have values in \eqn{[0, 1]}.
+#' @param weights An optional numeric vector of positive weights for the
+#' individuals. As with the other inputs, it must have `names`
+#' for individual identifiers.
 #' @param cores Number of CPU cores to use, for parallel calculations.
-#' (If `0`, use [parallel::detectCores()].)
+#'     (If `0`, use [parallel::detectCores()].)
 #' @param ... additional optional arguments
 #'
 #' @return results of the scan
