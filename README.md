@@ -1,6 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[![Travis build status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2)
+[![Travis build status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2) [![Coverage status](https://codecov.io/gh/rcorty/vqtl2/branch/master/graph/badge.svg)](https://codecov.io/github/rcorty/vqtl2?branch=master)
 
 vqtl2
 =====
