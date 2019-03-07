@@ -1,0 +1,22 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: r
+sudo: false
+cache: packages
+warnings_are_errors: false
+
+r:
+  - oldrel
+  - release
+  - devel
+
+r_github_packages:
+  - rqtl/qtl2
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+after_success:
+    - Rscript -e 'covr::codecov()'

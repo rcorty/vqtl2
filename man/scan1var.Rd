@@ -9,8 +9,16 @@ scan1var(pheno_name, mean_covar_names = NULL, var_covar_names = NULL,
   weights = NULL, num_cores = 1, ...)
 }
 \arguments{
+\item{pheno_name}{name of the phenotype to scan}
+
+\item{mean_covar_names}{names of the mean covariates}
+
+\item{var_covar_names}{names of the variance covariates}
+
 \item{alleleprobs}{Genotype probabilities as calculated by
 [qtl::calc_genoprob()].}
+
+\item{non_genetic_data}{phenotype and covararite data.frame}
 
 \item{model}{Indicates whether to use a normal model (least
 squares) or binary model (logistic regression) for the phenotype.
@@ -24,12 +32,6 @@ for individual identifiers.}
 (If `0`, use [parallel::detectCores() - 1].)}
 
 \item{...}{additional optional arguments}
-
-\item{pheno}{A data.frame of phenotypes, individuals x phenotypes.}
-
-\item{mean_addcovar}{An optional data.frame of additive covariates.}
-
-\item{var_addcovar}{An optional data.frame of additive covariates.}
 }
 \value{
 results of the scan

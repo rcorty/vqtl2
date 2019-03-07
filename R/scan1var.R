@@ -1,16 +1,17 @@
 #' Mean-Variance genome scan with a single-QTL model
 #'
+#' @param pheno_name name of the phenotype to scan
+#' @param mean_covar_names names of the mean covariates
+#' @param var_covar_names names of the variance covariates
 #' @param alleleprobs Genotype probabilities as calculated by
 #'     [qtl::calc_genoprob()].
-#' @param pheno A data.frame of phenotypes, individuals x phenotypes.
-#' @param mean_addcovar An optional data.frame of additive covariates.
-#' @param var_addcovar An optional data.frame of additive covariates.
-#' @param weights An optional numeric vector of positive weights for the
-#' individuals. As with the other inputs, it must have `names`
-#' for individual identifiers.
+#' @param non_genetic_data phenotype and covararite data.frame
 #' @param model Indicates whether to use a normal model (least
 #'     squares) or binary model (logistic regression) for the phenotype.
 #'     If `model="binary"`, the phenotypes must have values in \eqn{[0, 1]}.
+#' @param weights An optional numeric vector of positive weights for the
+#' individuals. As with the other inputs, it must have `names`
+#' for individual identifiers.
 #' @param num_cores Number of CPU cores to use, for parallel calculations.
 #'     (If `0`, use [parallel::detectCores() - 1].)
 #'
@@ -18,6 +19,8 @@
 #'
 #' @return results of the scan
 #' @export
+#'
+#' @importFrom dplyr %>%
 #'
 scan1var <- function(pheno_name,
                      mean_covar_names = NULL,
@@ -35,11 +38,9 @@ scan1var <- function(pheno_name,
                    'normal' = stats::gaussian,
                    'binary' = stats::binomial)
 
-  mean_null_formula <- make_formula(response_name = pheno_name, covar_names = mean_covar_names)
-  var_null_formula <- make_formula(covar_names = var_covar_names)
-
-  null_fit <- scan1var_nullfit(formulae = list(mean_null = mean_null_formula,
-                                               var_null = var_null_formula),
+  null_fit <- scan1var_nullfit(pheno_name = pheno_name,
+                               mean_covar_names = mean_covar_names,
+                               var_covar_names = var_covar_names,
                                data = non_genetic_data,
                                family = family)
 
@@ -121,7 +122,9 @@ scan1var_onechr <- function(pheno_name,
 
 }
 
-scan1var_nullfit <- function(formulae,
+scan1var_nullfit <- function(pheno_name,
+                             mean_covar_names,
+                             var_covar_names,
                              data,
                              family) {
 
@@ -168,3 +171,31 @@ scan1var_onelocus <- function(marker_name,
                  v_dof = dof(f = mv) - dof(m))
 }
 
+
+#' Test whether an R object is a scan1var
+#'
+#' @param x the object to test
+#'
+#' @return TRUE if [x] is a scan1var, FALSE otherwise
+#' @export
+#'
+is_scan1var <- function(x) {
+
+  if (!identical(class(x), c('scan1var', 'scan1', 'tbl_df', 'tbl', 'data.frame')))
+    return(FALSE)
+
+  if (!identical(x = sapply(X = x, FUN = class),
+                 y = c(marker = 'character',
+                       mv_lr = 'numeric',
+                       mv_dof = 'integer',
+                       m_lr = 'numeric',
+                       m_dof = 'integer',
+                       v_lr = 'numeric',
+                       v_dof = 'integer')))
+    return(FALSE)
+
+  if (any(with(data = x, expr = c(mv_lr, m_lr, v_lr)) < 0))
+    return(FALSE)
+
+  return(TRUE)
+}
