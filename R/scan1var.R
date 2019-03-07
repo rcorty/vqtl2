@@ -78,7 +78,9 @@ scan1var <- function(pheno_name,
     parallel::stopCluster(cl = cl)
   }
 
-  return(result)
+  result %>%
+    prepend_class(new_class = 'scan1') %>%
+    prepend_class(new_class = 'scan1var')
 }
 
 
@@ -128,8 +130,8 @@ scan1var_nullfit <- function(pheno_name,
                              data,
                              family) {
 
-  fit_dglm(mf = formulae$mean_null,
-           df = formulae$var_null,
+  fit_dglm(mf = make_formula(response_name = pheno_name, covar_names = mean_covar_names),
+           df = make_formula(covar_names = var_covar_names),
            data = data,
            family = family)
 
