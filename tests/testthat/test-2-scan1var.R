@@ -18,7 +18,7 @@ testthat::test_that(
     s1v <- scan1var(pheno_name = 'liver',
                     mean_covar_names = 'spleen',
                     alleleprobs = iron_ap,
-                    non_genetic_data = as.data.frame(iron$pheno))
+                    non_genetic_data = tibble::as_tibble(iron$pheno))
 
     expect_true(object = is_scan1var(x = s1v))
 

@@ -38,11 +38,11 @@ scan1var <- function(pheno_name,
                    'normal' = stats::gaussian,
                    'binary' = stats::binomial)
 
-  null_fit <- scan1var_nullfit(pheno_name = pheno_name,
-                               mean_covar_names = mean_covar_names,
-                               var_covar_names = var_covar_names,
-                               data = non_genetic_data,
-                               family = family)
+  null_fit <- fit_dglm(mf = make_formula(response_name = pheno_name, covar_names = mean_covar_names),
+                       vf = make_formula(covar_names = var_covar_names),
+                       locus_data = non_genetic_data,
+                       family = family,
+                       error_silently = FALSE)
 
   num_cores <- ifelse(test = num_cores == 0,
                       yes = parallel::detectCores() - 1,
@@ -114,8 +114,8 @@ scan1var_onechr <- function(pheno_name,
     results[[mn]] <- scan1var_onelocus(
       marker_name = mn,
       formulae = formulae,
-      data = dplyr::bind_cols(as.data.frame(alleleprobs[,,mn]),
-                              non_genetic_data),
+      locus_data = dplyr::bind_cols(as.data.frame(alleleprobs[,,mn]),
+                                    non_genetic_data),
       family = family,
       null_fit = null_fit)
   }
@@ -124,43 +124,29 @@ scan1var_onechr <- function(pheno_name,
 
 }
 
-scan1var_nullfit <- function(pheno_name,
-                             mean_covar_names,
-                             var_covar_names,
-                             data,
-                             family) {
-
-  fit_dglm(mf = make_formula(response_name = pheno_name, covar_names = mean_covar_names),
-           df = make_formula(covar_names = var_covar_names),
-           data = data,
-           family = family)
-
-}
 
 scan1var_onelocus <- function(marker_name,
                               formulae,
-                              data,
+                              locus_data,
                               family,
                               null_fit) {
 
-  mv = tryNA(
-    fit_dglm(mf = formulae$mean_alt,
-             df = formulae$var_alt,
-             data = data,
-             family = family)
-  )
+  mv = fit_dglm(mf = formulae$mean_alt,
+                vf = formulae$var_alt,
+                locus_data = locus_data,
+                family = family)
 
   m = tryNA(
     fit_dglm(mf = formulae$mean_alt,
-             df = formulae$var_null,
-             data = data,
+             vf = formulae$var_null,
+             locus_data = locus_data,
              family = family)
   )
 
   v = tryNA(
     fit_dglm(mf = formulae$mean_null,
-             df = formulae$var_alt,
-             data = data,
+             vf = formulae$var_alt,
+             locus_data = locus_data,
              family = family)
   )
 
@@ -186,7 +172,7 @@ is_scan1var <- function(x) {
   if (!identical(class(x), c('scan1var', 'scan1', 'tbl_df', 'tbl', 'data.frame')))
     return(FALSE)
 
-  if (!identical(x = sapply(X = x, FUN = class),
+  if (!identical(x = sapply(X = x, FUN = class)[1:7],
                  y = c(marker = 'character',
                        mv_lr = 'numeric',
                        mv_dof = 'integer',
