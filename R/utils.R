@@ -83,8 +83,9 @@ log_lik <- function(f) {
     return(-0.5*f$m2loglik)
   }
   if (inherits(x = f, what = 'hglm')) {
-    if (abs(f$likelihood$hlik) > 1e8) { return(NA) }
-    return(f$likelihood$hlik)
+    stop('no hglm for now.')
+    # if (abs(f$likelihood$hlik) > 1e8) { return(NA) }
+    # return(f$likelihood$hlik)
   }
   return(stats::logLik(object = f))
 }
