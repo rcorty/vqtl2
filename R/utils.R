@@ -154,3 +154,9 @@ make_formula <- function(response_name = NULL,
   )
 
 }
+
+
+prepend_class <- function(x, new_class) {
+  class(x = x) <- c(new_class, class(x = x))
+  return(x)
+}

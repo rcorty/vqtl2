@@ -18,6 +18,8 @@
 #' @return results of the scan
 #' @export
 #'
+#' @importFrom dplyr %>%
+#'
 scan1var <- function(pheno_name,
                      mean_covar_names = NULL,
                      var_covar_names = NULL,
@@ -34,24 +36,24 @@ scan1var <- function(pheno_name,
                    'normal' = stats::gaussian,
                    'binary' = stats::binomial)
 
-  mean_null_formula <- make_formula(response_name = pheno_name, covar_names = mean_covar_names)
-  var_null_formula <- make_formula(covar_names = var_covar_names)
-
-  null_fit <- scan1var_nullfit(formulae = list(mean_null = mean_null_formula,
-                                               var_null = var_null_formula),
+  null_fit <- scan1var_nullfit(pheno_name = pheno_name,
+                               mean_covar_names = mean_covar_names,
+                               var_covar_names = var_covar_names,
                                data = non_genetic_data,
                                family = family)
 
-  dplyr::bind_rows(
-    lapply(X = alleleprobs,
-           FUN = scan1var_onechr,
-           pheno_name = pheno_name,
-           mean_covar_names = mean_covar_names,
-           var_covar_names = var_covar_names,
-           non_genetic_data = non_genetic_data,
-           family = family,
-           null_fit = null_fit)
-  )
+  result <- lapply(X = alleleprobs,
+                   FUN = scan1var_onechr,
+                   pheno_name = pheno_name,
+                   mean_covar_names = mean_covar_names,
+                   var_covar_names = var_covar_names,
+                   non_genetic_data = non_genetic_data,
+                   family = family,
+                   null_fit = null_fit)
+
+  dplyr::bind_rows(result) %>%
+    prepend_class(new_class = 'scan1') %>%
+    prepend_class(new_class = 'scan1var')
 }
 
 
@@ -95,12 +97,14 @@ scan1var_onechr <- function(pheno_name,
 
 }
 
-scan1var_nullfit <- function(formulae,
+scan1var_nullfit <- function(pheno_name,
+                             mean_covar_names,
+                             var_covar_names,
                              data,
                              family) {
 
-  fit_dglm(mf = formulae$mean_null,
-           df = formulae$var_null,
+  fit_dglm(mf = make_formula(response_name = pheno_name, covar_names = mean_covar_names),
+           df = make_formula(covar_names = var_covar_names),
            data = data,
            family = family)
 
@@ -142,3 +146,31 @@ scan1var_onelocus <- function(marker_name,
                  v_dof = dof(f = mv) - dof(m))
 }
 
+
+#' Test whether an R object is a scan1var
+#'
+#' @param x the object to test
+#'
+#' @return TRUE if [x] is a scan1var, FALSE otherwise
+#' @export
+#'
+is_scan1var <- function(x) {
+
+  if (!identical(class(x), c('scan1var', 'scan1', 'tbl_df', 'tbl', 'data.frame')))
+    return(FALSE)
+
+  if (!identical(x = sapply(X = x, FUN = class),
+                 y = c(marker = 'character',
+                       mv_lr = 'numeric',
+                       mv_dof = 'integer',
+                       m_lr = 'numeric',
+                       m_dof = 'integer',
+                       v_lr = 'numeric',
+                       v_dof = 'integer')))
+    return(FALSE)
+
+  if (any(with(data = x, expr = c(mv_lr, m_lr, v_lr)) < 0))
+    return(FALSE)
+
+  return(TRUE)
+}
