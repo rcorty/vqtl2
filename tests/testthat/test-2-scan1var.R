@@ -10,7 +10,7 @@ testthat::test_that(
 
     iron <- read_cross2(file = system.file("extdata", "iron.zip",
                                            package = "qtl2"))
-    iron <- subset(x = iron, chr = c(18, 19))
+    iron <- subset(x = iron, chr = c(17, 18, 19))
     iron_map <- insert_pseudomarkers(map = iron$gmap, step = 1)
     iron_gp <- calc_genoprob(cross = iron, map = iron_map, error_prob = 0.002)
     iron_ap <- genoprob_to_alleleprob(probs = iron_gp)
@@ -19,6 +19,17 @@ testthat::test_that(
                     mean_covar_names = 'spleen',
                     alleleprobs = iron_ap,
                     non_genetic_data = as.data.frame(iron$pheno))
+
+    expect_true(object = is_scan1var(x = s1v))
+
+    expect_equal(object = nrow(x = s1v),
+                 expected = sum(sapply(X = iron_map, FUN = length)))
+
+    s1v <- scan1var(pheno_name = 'liver',
+                    mean_covar_names = 'spleen',
+                    alleleprobs = iron_ap,
+                    non_genetic_data = as.data.frame(iron$pheno),
+                    num_cores = 0)
 
     expect_true(object = is_scan1var(x = s1v))
 
