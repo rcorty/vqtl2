@@ -137,13 +137,13 @@ pull_marker_names <- function(apr) {
 }
 
 make_formula <- function(response_name = NULL,
-                         covar_names) {
+                         covar_names = '1') {
 
   if (all(is.null(response_name), is.null(covar_names))) {
     covar_names <- 1
   }
 
-  stats::formula(
+  stats::as.formula(
     paste(response_name,
           '~',
           paste(
@@ -154,7 +154,6 @@ make_formula <- function(response_name = NULL,
   )
 
 }
-
 
 prepend_class <- function(x, new_class) {
   class(x = x) <- c(new_class, class(x = x))
