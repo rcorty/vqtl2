@@ -109,9 +109,7 @@ LRT <- function(alt, null) {
 }
 
 LOD <- function(alt, null) {
-
   return(0.5*LRT(alt = alt, null = null)/log(10))
-
 }
 
 LOD_from_LLs <- function(null_ll, alt_ll) {
