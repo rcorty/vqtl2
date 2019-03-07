@@ -9,11 +9,11 @@ iron <- read_cross2(file = system.file("extdata", "iron.zip", package = "qtl2"))
 map <- insert_pseudomarkers(map = iron$gmap, step = 1)
 pr <- calc_genoprob(cross = iron, map = map, error_prob = 0.002)
 apr <- genoprob_to_alleleprob(probs = pr)
-out <- scan1(genoprobs = apr, pheno = iron$pheno)
-
-plot(out, map, lodcolumn = 1, col="slateblue")
-plot(out, map, lodcolumn = 2, col="violetred", add=TRUE)
-legend("topleft", lwd=2, col=c("slateblue", "violetred"), colnames(out), bg="gray90")
+# out <- scan1(genoprobs = apr, pheno = iron$pheno)
+#
+# plot(out, map, lodcolumn = 1, col="slateblue")
+# plot(out, map, lodcolumn = 2, col="violetred", add=TRUE)
+# legend("topleft", lwd=2, col=c("slateblue", "violetred"), colnames(out), bg="gray90")
 
 system.time(
   s1v_iron <- scan1var(pheno_name = 'liver',
@@ -28,7 +28,7 @@ system.time(
                        mean_covar_names = 'spleen',
                        alleleprobs = apr,
                        non_genetic_data = as.data.frame(iron$pheno),
-                       num_cores = 3)
+                       num_cores = 4)
 )
 
 # do population
