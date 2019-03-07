@@ -124,7 +124,7 @@ LRT_from_LLs <- function(null_ll, alt_ll) {
 
 dof <- function(f) {
   if (inherits(x = f, what = 'dglm')) {
-    length(coef(f)) + length(coef(f$dispersion.fit)) - 2
+    length(coef(f)) + length(coef(f$dispersion.fit)) - 2L
   }
 }
 
