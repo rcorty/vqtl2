@@ -78,7 +78,15 @@ scan1var <- function(pheno_name,
     parallel::stopCluster(cl = cl)
   }
 
-  result %>%
+  null_mean_effects <- pull_effects(model = null_fit, effect_name_prefix = 'mean')
+  null_var_effects <- pull_effects(model = null_fit$dispersion.fit, effect_name_prefix = 'var')
+
+  dplyr::bind_cols(null_mean_effects, null_var_effects) %>%
+    dplyr::bind_rows(result) %>%
+    dplyr::select(marker,
+           dplyr::ends_with(match = '_lr'),
+           dplyr::ends_with(match = '_dof'),
+           dplyr::everything()) %>%
     prepend_class(new_class = 'scan1') %>%
     prepend_class(new_class = 'scan1var')
 }
@@ -151,12 +159,14 @@ scan1var_onelocus <- function(marker_name,
   )
 
   tibble::tibble(marker = marker_name,
-                 mv_lr = LRT(alt = mv, null = null_fit),
-                 mv_dof = dof(f = mv) - dof(null_fit),
-                 m_lr = LRT(alt = mv, null = v),
-                 m_dof = dof(f = mv) - dof(v),
-                 v_lr = LRT(alt = mv, null = m),
-                 v_dof = dof(f = mv) - dof(m))
+                 mvqtl_lr = LRT(alt = mv, null = null_fit),
+                 mvqtl_dof = dof(f = mv) - dof(null_fit),
+                 mqtl_lr = LRT(alt = mv, null = v),
+                 mqtl_dof = dof(f = mv) - dof(v),
+                 vqtl_lr = LRT(alt = mv, null = m),
+                 vqtl_dof = dof(f = mv) - dof(m)) %>%
+    dplyr::bind_cols(pull_effects(model = mv, effect_name_prefix = 'mean')) %>%
+    dplyr::bind_cols(pull_effects(model = mv$dispersion.fit, effect_name_prefix = 'var'))
 }
 
 
@@ -174,15 +184,15 @@ is_scan1var <- function(x) {
 
   if (!identical(x = sapply(X = x, FUN = class)[1:7],
                  y = c(marker = 'character',
-                       mv_lr = 'numeric',
-                       mv_dof = 'integer',
-                       m_lr = 'numeric',
-                       m_dof = 'integer',
-                       v_lr = 'numeric',
-                       v_dof = 'integer')))
+                       mvqtl_lr = 'numeric',
+                       mqtl_lr = 'numeric',
+                       vqtl_lr = 'numeric',
+                       mvqtl_dof = 'integer',
+                       mqtl_dof = 'integer',
+                       vqtl_dof = 'integer')))
     return(FALSE)
 
-  if (any(with(data = x, expr = c(mv_lr, m_lr, v_lr)) < 0))
+  if (any(with(data = x, expr = stats::na.omit(c(mvqtl_lr, mqtl_lr, vqtl_lr))) < 0))
     return(FALSE)
 
   return(TRUE)

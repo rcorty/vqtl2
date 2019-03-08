@@ -23,7 +23,7 @@ testthat::test_that(
     expect_true(object = is_scan1var(x = s1v))
 
     expect_equal(object = nrow(x = s1v),
-                 expected = sum(sapply(X = iron_map, FUN = length)))
+                 expected = sum(sapply(X = iron_map, FUN = length)) + 1)
 
     s1v <- scan1var(pheno_name = 'liver',
                     mean_covar_names = 'spleen',
@@ -34,7 +34,7 @@ testthat::test_that(
     expect_true(object = is_scan1var(x = s1v))
 
     expect_equal(object = nrow(x = s1v),
-                 expected = sum(sapply(X = iron_map, FUN = length)))
+                 expected = sum(sapply(X = iron_map, FUN = length)) + 1)
   }
 )
 

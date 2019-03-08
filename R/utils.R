@@ -184,3 +184,44 @@ prepend_class <- function(x, new_class) {
   class(x = x) <- c(new_class, class(x = x))
   return(x)
 }
+
+
+conditionally <- function(fun){
+  function(first_arg, ..., execute){
+    if(execute) return(fun(first_arg, ...))
+    else return(first_arg)
+  }
+}
+
+# cond_filter <- conditionally(filter)
+# cond_select <- conditionally(select)
+cond_mutate <- conditionally(dplyr::mutate)
+
+pull_effects <- function(model, effect_name_prefix = NULL) {
+
+  # browser()
+  model %>%
+    broom::tidy() %>%
+    dplyr::mutate(term = dplyr::case_when(term == '(Intercept)' ~ 'intercept',
+                                          TRUE ~ term)) %>%
+    cond_mutate(term = paste0(effect_name_prefix, '_', term),
+                execute = !is.null(effect_name_prefix)) %>%
+    dplyr::select(term, estimate, std.error) %>%
+    tidyr::gather(key = measure, value = val, estimate, std.error) %>%
+    dplyr::mutate(measure = dplyr::case_when(measure == 'estimate' ~ 'estim',
+                                             measure == 'std.error' ~ 'se')) %>%
+    tidyr::unite(col = 'united', term, measure) %>%
+    tidyr::spread(key = united, value = val)
+}
+
+#
+# broom::tidy(x = null_fit) %>%
+#   dplyr::mutate(term = ifelse(test = term == '(Intercept)',
+#                               yes = 'intercept',
+#                               no = term)) %>%
+#   if (TRUE) dplyr::mutate(a = 3) %>%
+#   dplyr::select(term, estimate, std.error) %>%
+#   tidyr::gather(key = measure, value = val, estimate, std.error) %>%
+#   tidyr::unite(col = 'united', term, measure) %>%
+#   tidyr::spread(key = united, value = val)
+#
