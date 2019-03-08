@@ -23,8 +23,8 @@
 #' @importFrom dplyr %>%
 #'
 scan1var <- function(pheno_name,
-                     mean_covar_names = NULL,
-                     var_covar_names = NULL,
+                     mean_covar_names = '1',
+                     var_covar_names = '1',
                      alleleprobs,
                      non_genetic_data,
                      model = c("normal", "binary"),

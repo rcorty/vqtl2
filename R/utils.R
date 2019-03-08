@@ -35,7 +35,7 @@ fit_dglm <- function(mf, vf, locus_data, family, wts = NULL, error_silently = TR
       dglm::dglm(
         formula = mf,
         dformula = vf,
-        data = force(locus_data),
+        data = locus_data,
         method = 'ml',
         family = family,
         ykeep = FALSE)
@@ -44,7 +44,7 @@ fit_dglm <- function(mf, vf, locus_data, family, wts = NULL, error_silently = TR
     dglm::dglm(
       formula = mf,
       dformula = vf,
-      data = force(locus_data),
+      data = locus_data,
       method = 'ml',
       family = family,
       ykeep = FALSE
@@ -163,10 +163,6 @@ pull_marker_names <- function(apr) {
 
 make_formula <- function(response_name = NULL,
                          covar_names = '1') {
-
-  if (all(is.null(response_name), is.null(covar_names))) {
-    covar_names <- 1
-  }
 
   stats::as.formula(
     paste(response_name,
