@@ -29,7 +29,7 @@ testthat::test_that(
                     mean_covar_names = 'spleen',
                     alleleprobs = iron_ap,
                     non_genetic_data = as.data.frame(iron$pheno),
-                    num_cores = 0)
+                    num_cores = 2)
 
     expect_true(object = is_scan1var(x = s1v))
 

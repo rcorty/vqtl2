@@ -199,7 +199,9 @@ cond_mutate <- conditionally(dplyr::mutate)
 
 pull_effects <- function(model, effect_name_prefix = NULL) {
 
-  # browser()
+  term <- estimate <- std.error <- 'fake global for CRAN'
+  measure <- val <- united <- 'fake global for CRAN'
+
   model %>%
     broom::tidy() %>%
     dplyr::mutate(term = dplyr::case_when(term == '(Intercept)' ~ 'intercept',

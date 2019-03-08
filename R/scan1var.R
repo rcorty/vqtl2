@@ -48,6 +48,8 @@ scan1var <- function(pheno_name,
                       yes = parallel::detectCores() - 1,
                       no = num_cores)
 
+  i <- marker <- 'fake global for CRAN'
+
   if (num_cores == 1) {
     result <- dplyr::bind_rows(
       lapply(X = alleleprobs,
