@@ -1,47 +1,116 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[![Travis build status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2) [![Coverage status](https://codecov.io/gh/rcorty/vqtl2/branch/master/graph/badge.svg)](https://codecov.io/github/rcorty/vqtl2?branch=master)
 
-vqtl2
-=====
+# vqtl2 <a href='https://github.com/rcorty/vqtl2'><img src='man/figures/hex_logo.png' align="right" height="139" /></a>
 
-The goal of vqtl2 is to ...
+[![Travis build
+status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2)
+[![Coverage
+status](https://codecov.io/gh/rcorty/vqtl2/branch/master/graph/badge.svg)](https://codecov.io/github/rcorty/vqtl2?branch=master)
 
-Installation
-------------
+## Overview
 
-You can install the released version of vqtl2 from [CRAN](https://CRAN.R-project.org) with:
+vqtl2 is a drop-in extension of qtl2, providing the functions to
+accommodate variance heterogeneity arising from background factors and
+detect vQTL, as described in the literature:
+
+  - [QTL Mapping on a Background of Variance
+    Heterogeneity](http://www.g3journal.org/content/8/12/3767)
+  - [Mean-Variance QTL Mapping Identifies Novel QTL for Circadian
+    Activity and Exploratory Behavior in
+    Mice](http://www.g3journal.org/content/8/12/3783)
+  - [vqtl: an R package for Mean-Variance QTL Mapping
+    (version 1)](http://www.g3journal.org/content/8/12/3757)
+
+The central functions of package `vqtl2` are:
+
+  - `scan1var()` conducts a genome scan
+  - `scan1var_perm()` conducts permutations to assess the statistical
+    significance of findings
+  - `mean_var_plot()` plots the genetic and non-genetic effects at a
+    given locus
+
+These all inter-operate with package `qtl` and follow most of the same
+paradigms.
+
+If you are new to QTL mapping, the best place to start is the [Karl
+Broman’s website](https://kbroman.org/).
+
+## Installation
 
 ``` r
-install.packages("vqtl2")
+# The easiest way to get vqtl2 currently is from github.
+# You'll need to download the `devtools` package
+install.packages('devtools')
+devtools::install_github(repo = 'rcorty/vqtl2')
 ```
 
-Example
--------
+<!-- ### Development version -->
 
-This is a basic example which shows you how to solve a common problem:
+<!-- To get a bug fix, or use a feature from the development version, you can install -->
 
-``` r
-## basic example code
-```
+<!-- dplyr from GitHub. -->
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+<!-- ```{r, eval = FALSE} -->
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+<!-- # install.packages("devtools") -->
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+<!-- devtools::install_github("tidyverse/dplyr") -->
 
-You can also embed plots, for example:
+<!-- ``` -->
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+<!-- ## Cheatsheet -->
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+<!-- <a href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf"><img src="https://raw.githubusercontent.com/rstudio/cheatsheets/master/pngs/thumbnails/data-transformation-cheatsheet-thumbs.png" width="630" height="252"/></a> -->
+
+<!-- ## Usage -->
+
+<!-- ```{r, message = FALSE} -->
+
+<!-- library(dplyr) -->
+
+<!-- starwars %>% -->
+
+<!--   filter(species == "Droid") -->
+
+<!-- starwars %>% -->
+
+<!--   select(name, ends_with("color")) -->
+
+<!-- starwars %>% -->
+
+<!--   mutate(name, bmi = mass / ((height / 100)  ^ 2)) %>% -->
+
+<!--   select(name:mass, bmi) -->
+
+<!-- starwars %>% -->
+
+<!--   arrange(desc(mass)) -->
+
+<!-- starwars %>% -->
+
+<!--   group_by(species) %>% -->
+
+<!--   summarise( -->
+
+<!--     n = n(), -->
+
+<!--     mass = mean(mass, na.rm = TRUE) -->
+
+<!--   ) %>% -->
+
+<!--   filter(n > 1, -->
+
+<!--          mass > 50) -->
+
+<!-- ``` -->
+
+<!-- ## Getting help -->
+
+<!-- If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/tidyverse/dplyr/issues). For questions and other discussion, please use [community.rstudio.com](https://community.rstudio.com/), or the [manipulatr mailing list](https://groups.google.com/group/manipulatr). -->
+
+<!-- --- -->
+
+<!-- Please note that this project is released with a [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). -->
+
+<!-- By participating in this project you agree to abide by its terms. -->
