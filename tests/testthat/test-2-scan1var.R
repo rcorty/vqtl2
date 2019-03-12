@@ -22,50 +22,57 @@ testthat::test_that(
 
     expect_true(object = is_scan1var(x = s1v))
 
+    # +1 for null fit
     expect_equal(object = nrow(x = s1v),
                  expected = sum(sapply(X = iron_map, FUN = length)) + 1)
 
     s1v <- scan1var(pheno_name = 'liver',
                     mean_covar_names = 'spleen',
                     alleleprobs = iron_ap,
-                    non_genetic_data = as.data.frame(iron$pheno),
+                    non_genetic_data = tibble::as_tibble(iron$pheno),
                     num_cores = 2)
 
     expect_true(object = is_scan1var(x = s1v))
 
+    # +1 for null fit
     expect_equal(object = nrow(x = s1v),
                  expected = sum(sapply(X = iron_map, FUN = length)) + 1)
   }
 )
 
 
+testthat::test_that(
+  desc = 'DO experiment',
+  code = {
 
-# # do population
-# gatti_file <- 'https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do.zip'
-#
-# gatti_cross <- read_cross2(file = gatti_file)
-#
-# small_do_cross <- subset(x = gatti_cross, ind = 1:100, chr = 1:5)
-#
-# map <- insert_pseudomarkers(small_do_cross$gmap, step = 10)
-#
-# pr <- calc_genoprob(cross = small_do_cross, map = map, quiet = FALSE)
-#
-# apr <- genoprob_to_alleleprob(probs = pr, quiet = FALSE)
-#
-# so <- scan1(genoprobs = apr, pheno = small_do_cross$pheno)
-#
-# plot(x = so, map = small_do_cross$pmap)
-#
-#
-# sov <- scan1var(pheno_name = 'WBC',
-#                 mean_covar_names = 'NEUT',
-#                 var_covar_names = 'NEUT',
-#                 alleleprobs = apr,
-#                 non_genetic_data = as.data.frame(x = small_do_cross$pheno))
-#
-# plot(x = sov, map = small_do_cross$pmap)
-#
+    testthat::skip_on_cran()
+
+    gatti_file <- 'https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do.zip'
+
+    gatti_cross <- read_cross2(file = gatti_file)
+
+    small_do_cross <- subset(x = gatti_cross, ind = 1:100, chr = c(17, 18, 19))
+
+    map <- insert_pseudomarkers(small_do_cross$gmap, step = 10)
+
+    pr <- calc_genoprob(cross = small_do_cross, map = map, quiet = FALSE)
+
+    apr <- genoprob_to_alleleprob(probs = pr, quiet = FALSE)
+
+    s1v <- scan1var(pheno_name = 'WBC',
+                    mean_covar_names = 'NEUT',
+                    var_covar_names = 'NEUT',
+                    alleleprobs = apr,
+                    non_genetic_data = tibble::as_tibble(x = small_do_cross$pheno))
+
+    expect_true(object = is_scan1var(x = s1v))
+
+    # +1 for null fit
+    expect_equal(object = nrow(x = s1v),
+                 expected = sum(sapply(X = map, FUN = length)) + 1)
+  }
+)
+
 #
 # # riself
 # grav2 <- read_cross2( system.file("extdata", "grav2.zip", package="qtl2") )

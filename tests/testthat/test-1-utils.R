@@ -19,5 +19,6 @@ testthat::test_that(
     expect_equal(object = vqtl2:::make_formula(response_name = 'a',
                                                covar_names = c('b', 'c')),
                  expected = stats::formula(a ~ b + c))
+
   }
 )
