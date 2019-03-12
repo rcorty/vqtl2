@@ -1,15 +1,3 @@
-#
-# pull_additive_component <- function(gp) {
-#
-# 	tibble::tibble(add = switch(
-# 		attr(x = gp, which = 'crosstype'),
-# 		'f2' = gp[,2,] + 2*gp[,3,],
-# 		'bc' = gp[,2],
-# 		'do' =
-# 	)
-# 	)
-# }
-
 
 tryNA <- function(expr) {
   suppressWarnings(tryCatch(expr = expr,
@@ -198,8 +186,8 @@ conditionally <- function(fun){
   }
 }
 
-# cond_filter <- conditionally(filter)
-# cond_select <- conditionally(select)
+cond_filter <- conditionally(filter)
+cond_select <- conditionally(select)
 cond_mutate <- conditionally(dplyr::mutate)
 
 pull_effects <- function(model, which_submodel = c('mean', 'var')) {
@@ -226,15 +214,3 @@ pull_effects <- function(model, which_submodel = c('mean', 'var')) {
     tidyr::unite(col = 'united', term, measure) %>%
     tidyr::spread(key = united, value = val)
 }
-
-#
-# broom::tidy(x = null_fit) %>%
-#   dplyr::mutate(term = ifelse(test = term == '(Intercept)',
-#                               yes = 'intercept',
-#                               no = term)) %>%
-#   if (TRUE) dplyr::mutate(a = 3) %>%
-#   dplyr::select(term, estimate, std.error) %>%
-#   tidyr::gather(key = measure, value = val, estimate, std.error) %>%
-#   tidyr::unite(col = 'united', term, measure) %>%
-#   tidyr::spread(key = united, value = val)
-#
