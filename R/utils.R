@@ -17,6 +17,12 @@ tryNA <- function(expr) {
                             finally = NA))
 }
 
+tryNULL <- function(expr) {
+  suppressWarnings(tryCatch(expr = expr,
+                            error = function(e) NULL,
+                            finally = NULL))
+}
+
 fit_dglm <- function(mf, vf, locus_data, family, wts = NULL, error_silently = TRUE) {
 
   # this didn't work -- some problem with how dglm eval's namespaces?
@@ -31,7 +37,7 @@ fit_dglm <- function(mf, vf, locus_data, family, wts = NULL, error_silently = TR
   #           ykeep = FALSE)
 
   if (error_silently) {
-    tryNA(
+    tryNULL(
       dglm::dglm(
         formula = mf,
         dformula = vf,
@@ -118,7 +124,7 @@ log_lik <- function(f) {
 
 LRT <- function(alt, null) {
 
-  if (any(identical(alt, NA), identical(null, NA))) {
+  if (any(is.null(alt), is.null(null))) {
     return(NA)
   }
 
@@ -148,6 +154,9 @@ LRT_from_LLs <- function(null_ll, alt_ll) {
 
 
 dof <- function(f) {
+
+  if (is.null(f)) { return(NA) }
+
   if (inherits(x = f, what = 'dglm')) {
     length(stats::coef(f)) + length(stats::coef(f$dispersion.fit)) - 2L
   }
@@ -193,17 +202,23 @@ conditionally <- function(fun){
 # cond_select <- conditionally(select)
 cond_mutate <- conditionally(dplyr::mutate)
 
-pull_effects <- function(model, effect_name_prefix = NULL) {
+pull_effects <- function(model, which_submodel = c('mean', 'var')) {
 
   term <- estimate <- std.error <- 'fake global for CRAN'
   measure <- val <- united <- 'fake global for CRAN'
+
+  which_submodel <- match.arg(arg = which_submodel)
+
+  if (is.null(model)) { return(tibble::tibble()) }
+
+  if (which_submodel == 'var') { model <- model$dispersion.fit }
 
   model %>%
     broom::tidy() %>%
     dplyr::mutate(term = dplyr::case_when(term == '(Intercept)' ~ 'intercept',
                                           TRUE ~ term)) %>%
-    cond_mutate(term = paste0(effect_name_prefix, '_', term),
-                execute = !is.null(effect_name_prefix)) %>%
+    cond_mutate(term = paste0(which_submodel, '_', term),
+                execute = !is.null(which_submodel)) %>%
     dplyr::select(term, estimate, std.error) %>%
     tidyr::gather(key = measure, value = val, estimate, std.error) %>%
     dplyr::mutate(measure = dplyr::case_when(measure == 'estimate' ~ 'estim',

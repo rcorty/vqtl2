@@ -50,6 +50,7 @@ scan1var <- function(pheno_name,
 
   i <- marker <- 'fake global for CRAN'
 
+  # would like to have one call that works for single core or multicore
   if (num_cores == 1) {
     result <- dplyr::bind_rows(
       lapply(X = alleleprobs,
@@ -80,15 +81,20 @@ scan1var <- function(pheno_name,
     parallel::stopCluster(cl = cl)
   }
 
-  null_mean_effects <- pull_effects(model = null_fit, effect_name_prefix = 'mean')
-  null_var_effects <- pull_effects(model = null_fit$dispersion.fit, effect_name_prefix = 'var')
 
-  dplyr::bind_cols(null_mean_effects, null_var_effects) %>%
+  # make result -- first row is null_fit, rest is locus fits
+  dplyr::bind_cols(
+    tibble::tibble(marker = 'null_fit',
+                   mvqtl_lr = NA,
+                   mqtl_lr = NA,
+                   vqtl_lr = NA,
+                   mvqtl_dof = NA,
+                   mqtl_dof = NA,
+                   vqtl_dof = NA),
+    pull_effects(model = null_fit, which_submodel = 'mean'),
+    pull_effects(model = null_fit, which_submodel = 'var')
+  ) %>%
     dplyr::bind_rows(result) %>%
-    dplyr::select(marker,
-           dplyr::ends_with(match = '_lr'),
-           dplyr::ends_with(match = '_dof'),
-           dplyr::everything()) %>%
     prepend_class(new_class = 'scan1') %>%
     prepend_class(new_class = 'scan1var')
 }
@@ -98,7 +104,6 @@ scan1var_onechr <- function(pheno_name,
                             mean_covar_names,
                             var_covar_names,
                             alleleprobs,
-                            pheno,
                             non_genetic_data,
                             family,
                             null_fit) {
@@ -146,19 +151,17 @@ scan1var_onelocus <- function(marker_name,
                 locus_data = locus_data,
                 family = family)
 
-  m = tryNA(
-    fit_dglm(mf = formulae$mean_alt,
-             vf = formulae$var_null,
-             locus_data = locus_data,
-             family = family)
-  )
+  m = fit_dglm(mf = formulae$mean_alt,
+               vf = formulae$var_null,
+               locus_data = locus_data,
+               family = family)
 
-  v = tryNA(
-    fit_dglm(mf = formulae$mean_null,
-             vf = formulae$var_alt,
-             locus_data = locus_data,
-             family = family)
-  )
+  v = fit_dglm(mf = formulae$mean_null,
+               vf = formulae$var_alt,
+               locus_data = locus_data,
+               family = family)
+
+  # if (is.null(mv)) { browser() }
 
   tibble::tibble(marker = marker_name,
                  mvqtl_lr = LRT(alt = mv, null = null_fit),
@@ -167,8 +170,8 @@ scan1var_onelocus <- function(marker_name,
                  mqtl_dof = dof(f = mv) - dof(v),
                  vqtl_lr = LRT(alt = mv, null = m),
                  vqtl_dof = dof(f = mv) - dof(m)) %>%
-    dplyr::bind_cols(pull_effects(model = mv, effect_name_prefix = 'mean')) %>%
-    dplyr::bind_cols(pull_effects(model = mv$dispersion.fit, effect_name_prefix = 'var'))
+    dplyr::bind_cols(pull_effects(model = mv, which_submodel = 'mean')) %>%
+    dplyr::bind_cols(pull_effects(model = mv, which_submodel = 'var'))
 }
 
 
