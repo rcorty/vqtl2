@@ -50,37 +50,18 @@ scan1var <- function(pheno_name,
 
   i <- marker <- 'fake global for CRAN'
 
-  # would like to have one call that works for single core or multicore
-  if (num_cores == 1) {
-    result <- dplyr::bind_rows(
-      lapply(X = alleleprobs,
-             FUN = scan1var_onechr,
-             pheno_name = pheno_name,
-             mean_covar_names = mean_covar_names,
-             var_covar_names = var_covar_names,
-             non_genetic_data = non_genetic_data,
-             family = family,
-             null_fit = null_fit)
-    )
-  } else {
-
-    # would have preferred to use mclapply but it didn't work
-    cl <- parallel::makeCluster(spec = num_cores)
-    doParallel::registerDoParallel(cl = cl)
-    `%dopar%` <- foreach::`%dopar%`   # necessary to get the loop to parse
-    result <-  foreach::foreach(i = 1:length(alleleprobs), .combine = dplyr::bind_rows) %dopar% {
-
-      scan1var_onechr(pheno_name = pheno_name,
-                      mean_covar_names = mean_covar_names,
-                      var_covar_names = var_covar_names,
-                      alleleprobs = alleleprobs[[i]],
-                      non_genetic_data = non_genetic_data,
-                      family = family,
-                      null_fit = null_fit)
-    }
-    parallel::stopCluster(cl = cl)
-  }
-
+  # doesn't work -- I don't know why.
+  result <- parallel::mclapply(
+    X = alleleprobs,
+    FUN = scan1var_onechr,
+    pheno_name = pheno_name,
+    mean_covar_names = mean_covar_names,
+    var_covar_names = var_covar_names,
+    non_genetic_data = non_genetic_data,
+    family = family,
+    null_fit = null_fit,
+    mc.cores = num_cores
+  )
 
   # make result -- first row is null_fit, rest is locus fits
   dplyr::bind_cols(
@@ -100,10 +81,10 @@ scan1var <- function(pheno_name,
 }
 
 
-scan1var_onechr <- function(pheno_name,
+scan1var_onechr <- function(alleleprobs,
+                            pheno_name,
                             mean_covar_names,
                             var_covar_names,
-                            alleleprobs,
                             non_genetic_data,
                             family,
                             null_fit) {
@@ -129,8 +110,10 @@ scan1var_onechr <- function(pheno_name,
     results[[mn]] <- scan1var_onelocus(
       marker_name = mn,
       formulae = formulae,
-      locus_data = dplyr::bind_cols(as.data.frame(alleleprobs[,,mn]),
-                                    non_genetic_data),
+      locus_data = dplyr::bind_cols(
+        as.data.frame(alleleprobs[,,mn]),
+        non_genetic_data
+      ),
       family = family,
       null_fit = null_fit)
   }
@@ -146,22 +129,20 @@ scan1var_onelocus <- function(marker_name,
                               family,
                               null_fit) {
 
-  mv = fit_dglm(mf = formulae$mean_alt,
-                vf = formulae$var_alt,
+  mv <- fit_dglm(mf = formulae$mean_alt,
+                 vf = formulae$var_alt,
+                 locus_data = locus_data,
+                 family = family)
+
+  m <- fit_dglm(mf = formulae$mean_alt,
+                vf = formulae$var_null,
                 locus_data = locus_data,
                 family = family)
 
-  m = fit_dglm(mf = formulae$mean_alt,
-               vf = formulae$var_null,
-               locus_data = locus_data,
-               family = family)
-
-  v = fit_dglm(mf = formulae$mean_null,
-               vf = formulae$var_alt,
-               locus_data = locus_data,
-               family = family)
-
-  # if (is.null(mv)) { browser() }
+  v <- fit_dglm(mf = formulae$mean_null,
+                vf = formulae$var_alt,
+                locus_data = locus_data,
+                family = family)
 
   tibble::tibble(marker = marker_name,
                  mvqtl_lr = LRT(alt = mv, null = null_fit),

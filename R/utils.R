@@ -1,49 +1,30 @@
-
 tryNA <- function(expr) {
-  suppressWarnings(tryCatch(expr = expr,
-                            error = function(e) NA,
-                            finally = NA))
+  suppressWarnings(
+    tryCatch(expr = expr,
+             error = function(e) NA,
+             finally = NA)
+  )
 }
 
 tryNULL <- function(expr) {
-  suppressWarnings(tryCatch(expr = expr,
-                            error = function(e) NULL,
-                            finally = NULL))
+  suppressWarnings(
+    tryCatch(expr = expr,
+             error = function(e) NULL,
+             finally = NULL)
+  )
 }
 
 fit_dglm <- function(mf, vf, locus_data, family, wts = NULL, error_silently = TRUE) {
 
-  # this didn't work -- some problem with how dglm eval's namespaces?
-  # fit_dglm_ <- purrr::compose(ifelse(test = error_silently, yes = tryNA, no = identity),
-  #                             dglm::dglm)
-  #
-  # fit_dglm_(formula = mf,
-  #           dformula = vf,
-  #           data = force(locus_data),
-  #           method = 'ml',
-  #           family = family,
-  #           ykeep = FALSE)
+  fit_dglm_ <- purrr::compose(ifelse(test = error_silently, yes = tryNULL, no = identity),
+                              dglm::dglm)
 
-  if (error_silently) {
-    tryNULL(
-      dglm::dglm(
-        formula = mf,
-        dformula = vf,
-        data = locus_data,
-        method = 'ml',
-        family = family,
-        ykeep = FALSE)
-    )
-  } else {
-    dglm::dglm(
-      formula = mf,
-      dformula = vf,
-      data = locus_data,
-      method = 'ml',
-      family = family,
-      ykeep = FALSE
-    )
-  }
+  fit_dglm_(formula = mf,
+            dformula = vf,
+            data = locus_data,
+            method = 'ml',
+            family = family,
+            ykeep = FALSE)
 }
 
 fit_hglm <- function(mf, df, data, glm_family) {#, obs_weights) {
