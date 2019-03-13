@@ -38,14 +38,14 @@ scan1var <- function(pheno_name,
                    'normal' = stats::gaussian,
                    'binary' = stats::binomial)
 
-  null_result <- scan1var_nolocus(pheno_name = pheno_name,
-                                  mean_covar_names = mean_covar_names,
-                                  var_covar_names = var_covar_names,
-                                  non_genetic_data = non_genetic_data,
-                                  family = family)
+  null_fit <- scan1var_nolocus(pheno_name = pheno_name,
+                               mean_covar_names = mean_covar_names,
+                               var_covar_names = var_covar_names,
+                               non_genetic_data = non_genetic_data,
+                               family = family)
 
   # doesn't work due to a bug in dglm::dglm that Gordon Smyth is addressing
-  result <- parallel::mclapply(
+  scan_result <- parallel::mclapply(
     X = alleleprobs,
     FUN = scan1var_onechr,
     pheno_name = pheno_name,
@@ -53,13 +53,11 @@ scan1var <- function(pheno_name,
     var_covar_names = var_covar_names,
     non_genetic_data = non_genetic_data,
     family = family,
-    null_fit = null_result$null_fit,
+    null_fit = null_fit$fitted_model,
     mc.cores = if (num_cores == 0) (parallel::detectCores() - 1) else num_cores
   )
 
-  # make result -- first row is null_fit, rest is locus fits
-  null_result$result_table %>%
-    dplyr::bind_rows(result) %>%
+  dplyr::bind_rows(scan_result, null_fit$result_row) %>%
     prepend_class(new_class = 'scan1') %>%
     prepend_class(new_class = 'scan1var')
 }
@@ -78,8 +76,8 @@ scan1var_nolocus <- function(pheno_name,
                        error_silently = FALSE)
 
   list(
-    null_fit = null_fit,
-    result_table = dplyr::bind_cols(
+    fitted_model = null_fit,
+    result_row = dplyr::bind_cols(
       tibble::tibble(marker = 'null_fit',
                      mvqtl_lr = NA, mqtl_lr = NA, vqtl_lr = NA,
                      mvqtl_dof = NA, mqtl_dof = NA, vqtl_dof = NA),
@@ -111,17 +109,21 @@ scan1var_onechr <- function(alleleprobs,
                    mean_null = mean_null_formula,
                    var_null = var_null_formula)
 
-  results <- list()
 
+
+  # would be nice to do this with sapply,
+  # but alleleprobs is a (potentially big) 3d array
+  # so would have to make that into a list first, which could be slow
+  # maybe worth looking into...probably not
+
+  results <- list()
   for (mn in pull_marker_names(apr = alleleprobs)) {
 
     results[[mn]] <- scan1var_onelocus(
       marker_name = mn,
       formulae = formulae,
-      locus_data = dplyr::bind_cols(
-        as.data.frame(alleleprobs[,,mn]),
-        non_genetic_data
-      ),
+      locus_data = dplyr::bind_cols(as.data.frame(alleleprobs[,,mn]),
+                                    non_genetic_data),
       family = family,
       null_fit = null_fit)
   }
