@@ -38,79 +38,33 @@ Broman’s website](https://kbroman.org/).
 
 ## Installation
 
+I plan to put `vqtl2` on CRAN, but until then, the easiest way to get
+`vqtl2` is from github. The easiest way to download and install an R
+package from github is with the devtools package, which is available on
+CRAN. Here’s the `R` code to do that:
+
 ``` r
-# The easiest way to get vqtl2 currently is from github.
-# You'll need to download the `devtools` package
 install.packages('devtools')
 devtools::install_github(repo = 'rcorty/vqtl2')
 ```
 
-<!-- ### Development version -->
+## Usage
 
-<!-- To get a bug fix, or use a feature from the development version, you can install -->
+``` r
+library(vqtl2)
+# todo
+```
 
-<!-- dplyr from GitHub. -->
+## Getting help
 
-<!-- ```{r, eval = FALSE} -->
+If you encounter a bug, please post a minimal reproducible example on
+[the github issues page](https://github.com/rcorty/vqtl2/issues). For
+notes on how to produce a minimal reproducible example, check out [this
+StackOverflow
+post](https://stackoverflow.com/questions/5963269/how-to-make-a-great-r-reproducible-example?answertab=votes#tab-top).
 
-<!-- # install.packages("devtools") -->
+-----
 
-<!-- devtools::install_github("tidyverse/dplyr") -->
-
-<!-- ``` -->
-
-<!-- ## Cheatsheet -->
-
-<!-- <a href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf"><img src="https://raw.githubusercontent.com/rstudio/cheatsheets/master/pngs/thumbnails/data-transformation-cheatsheet-thumbs.png" width="630" height="252"/></a> -->
-
-<!-- ## Usage -->
-
-<!-- ```{r, message = FALSE} -->
-
-<!-- library(dplyr) -->
-
-<!-- starwars %>% -->
-
-<!--   filter(species == "Droid") -->
-
-<!-- starwars %>% -->
-
-<!--   select(name, ends_with("color")) -->
-
-<!-- starwars %>% -->
-
-<!--   mutate(name, bmi = mass / ((height / 100)  ^ 2)) %>% -->
-
-<!--   select(name:mass, bmi) -->
-
-<!-- starwars %>% -->
-
-<!--   arrange(desc(mass)) -->
-
-<!-- starwars %>% -->
-
-<!--   group_by(species) %>% -->
-
-<!--   summarise( -->
-
-<!--     n = n(), -->
-
-<!--     mass = mean(mass, na.rm = TRUE) -->
-
-<!--   ) %>% -->
-
-<!--   filter(n > 1, -->
-
-<!--          mass > 50) -->
-
-<!-- ``` -->
-
-<!-- ## Getting help -->
-
-<!-- If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/tidyverse/dplyr/issues). For questions and other discussion, please use [community.rstudio.com](https://community.rstudio.com/), or the [manipulatr mailing list](https://groups.google.com/group/manipulatr). -->
-
-<!-- --- -->
-
-<!-- Please note that this project is released with a [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). -->
-
-<!-- By participating in this project you agree to abide by its terms. -->
+Please note that the ‘vqtl2’ project is released with a [Contributor
+Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project,
+you agree to abide by its terms.
