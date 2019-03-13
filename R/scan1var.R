@@ -33,8 +33,6 @@ scan1var <- function(pheno_name,
                      ...)
 {
 
-  i <- marker <- 'fake global for CRAN'
-
   model <- match.arg(arg = model)
   family <- switch(EXPR = model,
                    'normal' = stats::gaussian,
