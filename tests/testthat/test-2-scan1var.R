@@ -8,8 +8,8 @@ testthat::test_that(
   desc = 'F2 experiment',
   code = {
 
-    iron <- read_cross2(file = system.file("extdata", "iron.zip",
-                                           package = "qtl2"))
+    iron <- read_cross2(file = system.file('extdata', 'iron.zip',
+                                           package = 'qtl2'))
     iron <- subset(x = iron, chr = c(17, 18, 19))
     iron_map <- insert_pseudomarkers(map = iron$gmap, step = 1)
     iron_gp <- calc_genoprob(cross = iron, map = iron_map, error_prob = 0.002)

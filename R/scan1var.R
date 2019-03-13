@@ -8,7 +8,7 @@
 #' @param non_genetic_data phenotype and covararite data.frame
 #' @param model Indicates whether to use a normal model (least
 #'     squares) or binary model (logistic regression) for the phenotype.
-#'     If `model="binary"`, the phenotypes must have values in \eqn{[0, 1]}.
+#'     If `model='binary'`, the phenotypes must have values in \eqn{[0, 1]}.
 #' @param weights An optional numeric vector of positive weights for the
 #' individuals. As with the other inputs, it must have `names`
 #' for individual identifiers.
@@ -27,7 +27,7 @@ scan1var <- function(pheno_name,
                      var_covar_names = '1',
                      alleleprobs,
                      non_genetic_data,
-                     model = c("normal", "binary"),
+                     model = c('normal', 'binary'),
                      weights = NULL,
                      num_cores = 1,
                      ...)
