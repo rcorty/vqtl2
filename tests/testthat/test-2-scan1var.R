@@ -3,7 +3,6 @@ context('Testing scan1var')
 library(qtl2)
 library(vqtl2)
 
-
 testthat::test_that(
   desc = 'F2 experiment',
   code = {
