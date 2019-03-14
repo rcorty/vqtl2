@@ -83,18 +83,17 @@ scan1var <- function(pheno_name,
   # make result -- first row is null_fit, rest is locus fits
   dplyr::bind_cols(
     tibble::tibble(marker = 'null_fit',
-                   mvqtl_lr = NA,
-                   mqtl_lr = NA,
-                   vqtl_lr = NA,
-                   mvqtl_dof = NA,
-                   mqtl_dof = NA,
-                   vqtl_dof = NA),
+                   mvqtl_lr = NA, mqtl_lr = NA, vqtl_lr = NA,
+                   mvqtl_dof = NA, mqtl_dof = NA, vqtl_dof = NA),
     pull_effects(model = null_fit, which_submodel = 'mean'),
     pull_effects(model = null_fit, which_submodel = 'var')
   ) %>%
     dplyr::bind_rows(result) %>%
-    prepend_class(new_class = 'scan1') %>%
-    prepend_class(new_class = 'scan1var')
+    add_attribute(which = 'pheno_name', value = pheno_name) %>%
+    add_attribute(which = 'mean_covar_names', value = mean_covar_names) %>%
+    add_attribute(which = 'var_covar_names', value = var_covar_names) %>%
+    add_attribute(which = 'model', value = model) %>%
+    prepend_classes(new_classes = c('scan1var', 'scan1'))
 }
 
 

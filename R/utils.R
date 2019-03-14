@@ -173,11 +173,13 @@ make_formula <- function(response_name = NULL,
 
 }
 
-prepend_class <- function(x, new_class) {
-  class(x = x) <- c(new_class, class(x = x))
-  return(x)
+prepend_classes <- function(x, new_classes) {
+  `class<-`(x, c(new_classes, class(x = x)))
 }
 
+add_attribute <- function(x, which, value) {
+  `attr<-`(x, which = which, value = value)
+}
 
 conditionally <- function(fun){
   function(first_arg, ..., execute){
