@@ -11,7 +11,7 @@ tryNULL <- function(expr) {
                             finally = NULL))
 }
 
-fit_dglm <- function(mf, vf, locus_data, family, wts = NULL, error_silently = TRUE) {
+fit_dglm <- function(mf, vf, locus_data, family, error_silently = TRUE) {
 
   # this didn't work -- some problem with how dglm eval's namespaces?
   # fit_dglm_ <- purrr::compose(ifelse(test = error_silently, yes = tryNA, no = identity),
