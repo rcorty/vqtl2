@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# vqtl2 <a href='https://github.com/rcorty/vqtl2'><img src='man/figures/logo.png' align="right" height="139" /></a>
+# vqtl2 <a href='https://rcorty.github.io/vqtl2/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 [![Travis build
 status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2)
