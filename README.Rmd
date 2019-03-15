@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# vqtl2 <a href='https://github.com/rcorty/vqtl2'><img src='man/figures/hex_logo.png' align="right" height="139" /></a>
+# vqtl2 <a href='https://github.com/rcorty/vqtl2'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 [![Travis build status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2)
 [![Coverage status](https://codecov.io/gh/rcorty/vqtl2/branch/master/graph/badge.svg)](https://codecov.io/github/rcorty/vqtl2?branch=master)

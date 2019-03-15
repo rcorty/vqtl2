@@ -6,7 +6,7 @@
 \usage{
 scan1var(pheno_name, mean_covar_names = "1", var_covar_names = "1",
   alleleprobs, non_genetic_data, model = c("normal", "binary"),
-  weights = NULL, num_cores = 1, ...)
+  num_cores = 1, ...)
 }
 \arguments{
 \item{pheno_name}{name of the phenotype to scan}
@@ -21,10 +21,8 @@ scan1var(pheno_name, mean_covar_names = "1", var_covar_names = "1",
 \item{non_genetic_data}{phenotype and covararite data.frame}
 
 \item{model}{Indicates whether to use a normal model (least
-squares) or binary model (logistic regression) for the phenotype.
-If `model="binary"`, the phenotypes must have values in \eqn{[0, 1]}.}
-
-\item{weights}{An optional numeric vector of positive weights for the
+    squares) or binary model (logistic regression) for the phenotype.
+    If `model='binary'`, the phenotypes must have values in \eqn{[0, 1]}.
 individuals. As with the other inputs, it must have `names`
 for individual identifiers.}
 
