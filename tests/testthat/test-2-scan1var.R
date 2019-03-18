@@ -8,35 +8,34 @@ testthat::test_that(
   desc = 'F2 experiment',
   code = {
 
-    iron <- read_cross2(file = system.file('extdata', 'iron.zip',
-                                           package = 'qtl2'))
-    iron <- subset(x = iron, chr = c(17, 18, 19))
-    iron_map <- insert_pseudomarkers(map = iron$gmap, step = 1)
-    iron_gp <- calc_genoprob(cross = iron, map = iron_map, error_prob = 0.002)
-    iron_ap <- genoprob_to_alleleprob(probs = iron_gp)
-
     s1v <- scan1var(pheno_name = 'liver',
                     mean_covar_names = 'spleen',
-                    alleleprobs = iron_ap,
-                    non_genetic_data = tibble::as_tibble(iron$pheno))
+                    alleleprobs = tiny_F2_ap,
+                    non_genetic_data = tibble::as_tibble(tiny_F2_cross$pheno))
 
     expect_true(object = is_scan1var(x = s1v))
 
-    # +1 for null fit
+    # result should have one row per locus, plus one for null fit
     expect_equal(object = nrow(x = s1v),
-                 expected = sum(sapply(X = iron_map, FUN = length)) + 1)
+                 expected = sum(sapply(X = tiny_F2_ap, FUN = dim)[3,]) + 1)
+
+    # some NA is expected in results, but should be < 10%
+    expect_lt(object = mean(is.na(s1v$mvqtl_lr)), expected = 0.1)
 
     s1v <- scan1var(pheno_name = 'liver',
                     mean_covar_names = 'spleen',
-                    alleleprobs = iron_ap,
-                    non_genetic_data = tibble::as_tibble(iron$pheno),
+                    alleleprobs = tiny_F2_ap,
+                    non_genetic_data = tibble::as_tibble(tiny_F2_cross$pheno),
                     num_cores = 2)
 
     expect_true(object = is_scan1var(x = s1v))
 
-    # +1 for null fit
+    # result should have one row per locus, plus one for null fit
     expect_equal(object = nrow(x = s1v),
-                 expected = sum(sapply(X = iron_map, FUN = length)) + 1)
+                 expected = sum(sapply(X = tiny_F2_ap, FUN = dim)[3,]) + 1)
+
+    # some NA is expected in results, but should be < 10%
+    expect_lt(object = mean(is.na(s1v$mvqtl_lr)), expected = 0.1)
   }
 )
 
@@ -47,29 +46,20 @@ testthat::test_that(
 
     testthat::skip_on_cran()
 
-    gatti_file <- 'https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do.zip'
-
-    gatti_cross <- read_cross2(file = gatti_file)
-
-    small_do_cross <- subset(x = gatti_cross, ind = 1:100, chr = c(17, 18, 19))
-
-    map <- insert_pseudomarkers(small_do_cross$gmap, step = 10)
-
-    pr <- calc_genoprob(cross = small_do_cross, map = map, quiet = FALSE)
-
-    apr <- genoprob_to_alleleprob(probs = pr, quiet = FALSE)
-
     s1v <- scan1var(pheno_name = 'WBC',
                     mean_covar_names = 'NEUT',
                     var_covar_names = 'NEUT',
-                    alleleprobs = apr,
-                    non_genetic_data = tibble::as_tibble(x = small_do_cross$pheno))
+                    alleleprobs = tiny_DO_ap,
+                    non_genetic_data = tibble::as_tibble(x = tiny_DO_cross$pheno))
 
     expect_true(object = is_scan1var(x = s1v))
 
-    # +1 for null fit
+    # result should have one row per locus, plus one for null fit
     expect_equal(object = nrow(x = s1v),
-                 expected = sum(sapply(X = map, FUN = length)) + 1)
+                 expected = sum(sapply(X = tiny_DO_ap, FUN = dim)[3,]) + 1)
+
+    # some NA is expected in results, but should be < 10%
+    expect_lt(object = mean(is.na(s1v$mvqtl_lr)), expected = 0.1)
   }
 )
 
