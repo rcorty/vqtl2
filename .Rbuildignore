@@ -1,3 +1,6 @@
+^pkgdown$
+^docs$
+^_pkgdown\.yml$
 ^data-raw$
 ^CODE_OF_CONDUCT\.md$
 ^LICENSE\.md$

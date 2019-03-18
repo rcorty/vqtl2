@@ -188,8 +188,8 @@ conditionally <- function(fun){
   }
 }
 
-cond_filter <- conditionally(filter)
-cond_select <- conditionally(select)
+cond_filter <- conditionally(dplyr::filter)
+cond_select <- conditionally(dplyr::select)
 cond_mutate <- conditionally(dplyr::mutate)
 
 pull_effects <- function(model, which_submodel = c('mean', 'var')) {
