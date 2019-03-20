@@ -4,7 +4,7 @@
 \alias{plot_allele_effects}
 \title{Plot allele effects}
 \usage{
-plot_allele_effects(s1v, which_marker)
+plot_allele_effects(s1v, marker)
 }
 \arguments{
 \item{s1v}{the scan1var object with the results to be plotted}

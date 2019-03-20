@@ -8,8 +8,9 @@
 #' @importFrom dplyr %>%
 #'
 plot_allele_effects <- function(s1v,
-                                which_marker) {
+                                marker) {
 
+  input_marker <- marker
   marker <- key <- value <- 'fake global for CRAN'
   meanvar_estimse <- meanvar <- estimse <- 'fake global for CRAN'
   mean_estim <- var_estim <- allele <- mean_se <- var_se <- 'fake global for CRAN'
@@ -21,7 +22,7 @@ plot_allele_effects <- function(s1v,
     allele_effect_names
 
   s1v %>%
-    dplyr::filter(marker == which_marker) %>%
+    dplyr::filter(marker == input_marker) %>%
     dplyr::select(dplyr::matches(paste(allele_effect_names, collapse = '|'))) %>%
     tidyr::gather(key = key, value = value) %>%
     tidyr::separate(col = 'key',
@@ -56,7 +57,7 @@ plot_allele_effects <- function(s1v,
     ggplot2::ggtitle(label = paste('Allele effects on',
                                    attr(x = s1v, which = 'pheno_name'),
                                    'at',
-                                   which_marker))
+                                   marker))
 
 
 }
