@@ -24,5 +24,7 @@ Imports:
     doParallel,
     foreach,
     broom,
-    tidyr
+    tidyr,
+    ggplot2,
+    purrr
 Remotes: rqtl/qtl2

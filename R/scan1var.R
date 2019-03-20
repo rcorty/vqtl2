@@ -93,6 +93,7 @@ scan1var <- function(pheno_name,
     add_attribute(which = 'mean_covar_names', value = mean_covar_names) %>%
     add_attribute(which = 'var_covar_names', value = var_covar_names) %>%
     add_attribute(which = 'model', value = model) %>%
+    add_attribute(which = 'alleles', value = attr(x = alleleprobs, which = 'alleles')) %>%
     prepend_classes(new_classes = c('scan1var', 'scan1'))
 }
 
