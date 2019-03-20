@@ -1,15 +1,12 @@
 context('Testing scan1var')
 
-library(qtl2)
-library(vqtl2)
-
-
 testthat::test_that(
   desc = 'F2 experiment',
   code = {
 
     s1v <- scan1var(pheno_name = 'liver',
                     mean_covar_names = 'spleen',
+                    var_covar_names = 'spleen',
                     alleleprobs = tiny_F2_ap,
                     non_genetic_data = tibble::as_tibble(tiny_F2_cross$pheno))
 

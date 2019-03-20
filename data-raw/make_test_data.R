@@ -1,4 +1,5 @@
 library(qtl2)
+library(vqtl2)
 
 # todo: add X chromosomes in to sample data whenever functionality to handle them gets added
 
@@ -19,7 +20,13 @@ tiny_F2_ap <- genoprob_to_alleleprob(probs = tiny_F2_gp)
 print(x = object.size(x = tiny_F2_ap), units = 'Mb')
 usethis::use_data(tiny_F2_ap)
 
-
+tiny_F2_s1v <- scan1var(pheno_name = 'liver',
+                        mean_covar_names = 'spleen',
+                        var_covar_names = 'spleen',
+                        alleleprobs = tiny_F2_ap,
+                        non_genetic_data = tibble::as_tibble(tiny_F2_cross$pheno))
+print(x = object.size(x = tiny_F2_s1v), units = 'Mb')
+usethis::use_data(tiny_F2_s1v)
 
 # get DO "cross" from qtl2data
 # accessed from commit 74baa4509a2671bc707cac560fc7cbf4ceb6c0c0
@@ -40,3 +47,11 @@ tiny_DO_gp <- calc_genoprob(cross = tiny_DO_cross, map = tiny_DO_map, error_prob
 tiny_DO_ap <- genoprob_to_alleleprob(probs = tiny_DO_gp)
 print(x = object.size(x = tiny_DO_ap), units = 'Mb')
 usethis::use_data(tiny_DO_ap)
+
+tiny_DO_s1v <- scan1var(pheno_name = 'WBC',
+                        mean_covar_names = 'NEUT',
+                        var_covar_names = 'NEUT',
+                        alleleprobs = tiny_DO_ap,
+                        non_genetic_data = tibble::as_tibble(tiny_DO_cross$pheno))
+print(x = object.size(x = tiny_DO_s1v), units = 'Mb')
+usethis::use_data(tiny_DO_s1v)

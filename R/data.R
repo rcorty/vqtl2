@@ -22,6 +22,15 @@
 #' @source \url{https://kbroman.org/qtl2/pages/sampledata.html}
 'tiny_F2_ap'
 
+#' @title A tiny scan1var result from an F2 cross
+#'
+#' @description The result of running scan1var on 'tiny_F2_cross' and 'tiny_F2_'ap'
+#'
+#' @format a data.frame as described...todo
+#'
+#' @source \url{https://kbroman.org/qtl2/pages/sampledata.html}
+'tiny_F2_s1v'
+
 #' @title A tiny DO "cross"
 #'
 #' @description DO experiment in which white blood cell concentration (WBC)
@@ -46,3 +55,12 @@
 
 #' @source \url{https://kbroman.org/qtl2/pages/sampledata.html}
 'tiny_DO_ap'
+
+#' @title A tiny scan1var result from a DO experiment
+#'
+#' @description The result of running scan1var on 'tiny_DO_cross' and 'tiny_DO_'ap'
+#'
+#' @format a data.frame as described...todo
+#'
+#' @source \url{https://kbroman.org/qtl2/pages/sampledata.html}
+'tiny_DO_s1v'
