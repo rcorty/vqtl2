@@ -18,6 +18,7 @@ The central functions of package `vqtl2` are:
 
 -   `scan1var()` conducts a genome scan
 -   `scan1var_perm()` conducts permutations to assess the statistical significance of findings
+-   `plot_scan1var()` plots the association statistic(s) at each genetic locus
 -   `plot_allele_effects()` plots the genetic and non-genetic effects at a given locus
 
 These all inter-operate with package `qtl` and follow most of the same paradigms.
