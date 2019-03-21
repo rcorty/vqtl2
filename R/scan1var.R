@@ -50,16 +50,16 @@ scan1var <- function(pheno_name,
 
   # would like to have one call that works for single core or multicore
   if (num_cores == 1) {
-    result <- dplyr::bind_rows(
-      lapply(X = alleleprobs,
-             FUN = scan1var_onechr,
-             pheno_name = pheno_name,
-             mean_covar_names = mean_covar_names,
-             var_covar_names = var_covar_names,
-             non_genetic_data = non_genetic_data,
-             family = family,
-             null_fit = null_fit)
-    )
+
+    result <- purrr::map_dfr(.x = alleleprobs,
+                             .f = scan1var_onechr,
+                             .id = 'chr',
+                             pheno_name = pheno_name,
+                             mean_covar_names = mean_covar_names,
+                             var_covar_names = var_covar_names,
+                             non_genetic_data = non_genetic_data,
+                             family = family,
+                             null_fit = null_fit)
   } else {
 
     # would have preferred to use mclapply but it didn't work
@@ -82,7 +82,8 @@ scan1var <- function(pheno_name,
 
   # make result -- first row is null_fit, rest is locus fits
   dplyr::bind_cols(
-    tibble::tibble(marker = 'null_fit',
+    tibble::tibble(chr = NA,
+                   marker = NA,
                    mvqtl_lr = NA, mqtl_lr = NA, vqtl_lr = NA,
                    mvqtl_dof = NA, mqtl_dof = NA, vqtl_dof = NA),
     pull_effects(model = null_fit, which_submodel = 'mean'),
@@ -185,8 +186,9 @@ is_scan1var <- function(x) {
   if (!identical(class(x), c('scan1var', 'scan1', 'tbl_df', 'tbl', 'data.frame')))
     return(FALSE)
 
-  if (!identical(x = sapply(X = x, FUN = class)[1:7],
-                 y = c(marker = 'character',
+  if (!identical(x = sapply(X = x, FUN = class)[1:8],
+                 y = c(chr = 'character',
+                       marker = 'character',
                        mvqtl_lr = 'numeric',
                        mqtl_lr = 'numeric',
                        vqtl_lr = 'numeric',

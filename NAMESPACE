@@ -2,5 +2,7 @@
 
 export(is_scan1var)
 export(plot_allele_effects)
+export(plot_scan1var)
 export(scan1var)
 importFrom(dplyr,"%>%")
+importFrom(ggplot2,aes)
