@@ -21,6 +21,10 @@ plot_scan1var <- function(s1v,
     dplyr::inner_join(y = s1v, by = c('chr', 'marker')) ->
     plotting_data
 
+  # todo: check that size of plotting_data is correct
+  # ie only dropped one row from s1v (the null fit row)
+  # and didn't drop any markers from cross$gmap
+
   plotting_data %>%
     ggplot2::ggplot(mapping = aes(x = loc)) +
     ggplot2::geom_line(mapping = aes(y = mvqtl_lr), color = 'black') +

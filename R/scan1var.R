@@ -31,24 +31,23 @@ scan1var <- function(pheno_name,
                      ...)
 {
 
-  model <- match.arg(arg = model)
-  family <- switch(EXPR = model,
+  # validate and process input
+  family <- switch(EXPR = match.arg(arg = model),
                    'normal' = stats::gaussian,
                    'binary' = stats::binomial)
 
+  if (num_cores == 0)
+    num_cores <- parallel::detectCores() - 1
+
+  # fit model with no genetic information (covariates only)
+  # this will be the null model for all mvQTL tests
   null_fit <- fit_dglm(mf = make_formula(response_name = pheno_name, covar_names = mean_covar_names),
                        vf = make_formula(covar_names = var_covar_names),
                        locus_data = non_genetic_data,
                        family = family,
                        error_silently = FALSE)
 
-  num_cores <- ifelse(test = num_cores == 0,
-                      yes = parallel::detectCores() - 1,
-                      no = num_cores)
-
-  i <- marker <- 'fake global for CRAN'
-
-  # would like to have one call that works for single core or multicore
+  # do the scan
   if (num_cores == 1) {
 
     result <- purrr::map_dfr(.x = alleleprobs,
@@ -62,28 +61,17 @@ scan1var <- function(pheno_name,
                              null_fit = null_fit)
   } else {
 
-    # would have preferred to use mclapply but it didn't work
-    cl <- parallel::makeCluster(spec = num_cores)
-    doParallel::registerDoParallel(cl = cl)
-    `%dopar%` <- foreach::`%dopar%`   # necessary to get the loop to parse
-    result <-  foreach::foreach(i = 1:length(alleleprobs), .combine = dplyr::bind_rows) %dopar% {
+    stop('Multicore processing not currently supported.')
 
-      scan1var_onechr(pheno_name = pheno_name,
-                      mean_covar_names = mean_covar_names,
-                      var_covar_names = var_covar_names,
-                      alleleprobs = alleleprobs[[i]],
-                      non_genetic_data = non_genetic_data,
-                      family = family,
-                      null_fit = null_fit)
-    }
-    parallel::stopCluster(cl = cl)
   }
 
 
-  # make result -- first row is null_fit, rest is locus fits
+  # make result
+  # -- first row is null_fit, rest is locus fits
+  # -- rest is the scan
+  # -- finally, add meta data
   dplyr::bind_cols(
-    tibble::tibble(chr = NA,
-                   marker = NA,
+    tibble::tibble(chr = NA, marker = NA,
                    mvqtl_lr = NA, mqtl_lr = NA, vqtl_lr = NA,
                    mvqtl_dof = NA, mqtl_dof = NA, vqtl_dof = NA),
     pull_effects(model = null_fit, which_submodel = 'mean'),
