@@ -9,7 +9,7 @@ plot_allele_effects(s1v, marker)
 \arguments{
 \item{s1v}{the scan1var object with the results to be plotted}
 
-\item{which_marker}{the marker at which the allele effects will be plotted}
+\item{marker}{the marker at which the allele effects will be plotted}
 }
 \value{
 the plot

@@ -4,10 +4,12 @@
 \alias{plot_scan1var}
 \title{Plot scan1var}
 \usage{
-plot_scan1var(cross, s1v)
+plot_scan1var(s1v, cross)
 }
 \arguments{
 \item{s1v}{the scan1var object to be plotted}
+
+\item{cross}{the cross object}
 }
 \value{
 the plot

@@ -1,26 +1,28 @@
 #' @title Plot scan1var
 #'
 #' @param s1v the scan1var object to be plotted
+#' @param cross the cross object
 #'
 #' @return the plot
 #' @export
 #' @importFrom dplyr %>%
+#' @importFrom ggplot2 aes
 #'
-plot_scan1var <- function(cross,
-                          s1v)
+plot_scan1var <- function(s1v,
+                          cross)
 {
 
   # combine gmap from cross with s1v to give each marker a location
   tibble::tibble(
     chr = rep(x = names(cross$gmap), times = sapply(X = cross$gmap, length)),
     marker = unlist(x = sapply(X = cross$gmap, FUN = names), use.names = FALSE),
-    loc = unlist(x = tiny_F2_cross$gmap, use.names = FALSE)
+    loc = unlist(x = cross$gmap, use.names = FALSE)
   ) %>%
     dplyr::inner_join(y = s1v, by = c('chr', 'marker')) ->
     plotting_data
 
   plotting_data %>%
-    ggplot2::ggplot(mapping = ggplot2::aes(x = loc)) +
+    ggplot2::ggplot(mapping = aes(x = loc)) +
     ggplot2::geom_line(mapping = aes(y = mvqtl_lr), color = 'black') +
     ggplot2::geom_line(mapping = aes(y = mqtl_lr), color = 'blue') +
     ggplot2::geom_line(mapping = aes(y = vqtl_lr), color = 'red') +
@@ -38,7 +40,7 @@ plot_scan1var <- function(cross,
 #' @title Plot allele effects
 #'
 #' @param s1v the scan1var object with the results to be plotted
-#' @param which_marker the marker at which the allele effects will be plotted
+#' @param marker the marker at which the allele effects will be plotted
 #'
 #' @return the plot
 #' @export
