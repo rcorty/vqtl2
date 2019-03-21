@@ -12,6 +12,8 @@ plot_scan1var <- function(s1v,
                           cross)
 {
 
+  loc <- mvqtl_lr <- mqtl_lr <- vqtl_lr <- 'fake global for CRAN'
+
   # combine gmap from cross with s1v to give each marker a location
   tibble::tibble(
     chr = rep(x = names(cross$gmap), times = sapply(X = cross$gmap, length)),
