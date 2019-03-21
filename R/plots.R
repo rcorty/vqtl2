@@ -1,3 +1,40 @@
+#' @title Plot scan1var
+#'
+#' @param s1v the scan1var object to be plotted
+#'
+#' @return the plot
+#' @export
+#' @importFrom dplyr %>%
+#'
+plot_scan1var <- function(cross,
+                          s1v)
+{
+
+  # combine gmap from cross with s1v to give each marker a location
+  tibble::tibble(
+    chr = rep(x = names(cross$gmap), times = sapply(X = cross$gmap, length)),
+    marker = unlist(x = sapply(X = cross$gmap, FUN = names), use.names = FALSE),
+    loc = unlist(x = tiny_F2_cross$gmap, use.names = FALSE)
+  ) %>%
+    dplyr::inner_join(y = s1v, by = c('chr', 'marker')) ->
+    plotting_data
+
+  plotting_data %>%
+    ggplot2::ggplot(mapping = ggplot2::aes(x = loc)) +
+    ggplot2::geom_line(mapping = aes(y = mvqtl_lr), color = 'black') +
+    ggplot2::geom_line(mapping = aes(y = mqtl_lr), color = 'blue') +
+    ggplot2::geom_line(mapping = aes(y = vqtl_lr), color = 'red') +
+    ggplot2::facet_grid(rows = ~ chr, space = 'free_x', switch = 'x') +
+    ggplot2::ylab('likelihood ratio') +
+    ggplot2::ggtitle(label = paste('scan1var:', attr(x = s1v, which = 'pheno_name'))) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(strip.placement = 'outside',
+                   strip.background = ggplot2::element_rect(fill = 'lightgray', color = NA),
+                   axis.title.x = ggplot2::element_blank())
+
+}
+
+
 #' @title Plot allele effects
 #'
 #' @param s1v the scan1var object with the results to be plotted
@@ -8,7 +45,8 @@
 #' @importFrom dplyr %>%
 #'
 plot_allele_effects <- function(s1v,
-                                marker) {
+                                marker)
+{
 
   input_marker <- marker
   marker <- key <- value <- 'fake global for CRAN'
@@ -61,3 +99,4 @@ plot_allele_effects <- function(s1v,
 
 
 }
+

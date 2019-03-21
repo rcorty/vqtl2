@@ -50,6 +50,7 @@ scan1var <- function(pheno_name,
 
   # would like to have one call that works for single core or multicore
   if (num_cores == 1) {
+
     result <- dplyr::bind_rows(
       lapply(X = alleleprobs,
              FUN = scan1var_onechr,
@@ -58,7 +59,8 @@ scan1var <- function(pheno_name,
              var_covar_names = var_covar_names,
              non_genetic_data = non_genetic_data,
              family = family,
-             null_fit = null_fit)
+             null_fit = null_fit),
+      .id = 'chr'
     )
   } else {
 
@@ -82,7 +84,8 @@ scan1var <- function(pheno_name,
 
   # make result -- first row is null_fit, rest is locus fits
   dplyr::bind_cols(
-    tibble::tibble(marker = 'null_fit',
+    tibble::tibble(chr = NA,
+                   marker = NA,
                    mvqtl_lr = NA, mqtl_lr = NA, vqtl_lr = NA,
                    mvqtl_dof = NA, mqtl_dof = NA, vqtl_dof = NA),
     pull_effects(model = null_fit, which_submodel = 'mean'),

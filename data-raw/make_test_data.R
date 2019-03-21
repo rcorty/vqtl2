@@ -10,12 +10,11 @@ print(x = object.size(x = F2_cross), units = 'Mb')
 
 tiny_F2_cross <- subset(x = F2_cross, chr = c(17, 18, 19))
 print(x = object.size(x = F2_cross), units = 'Mb')
+
+tiny_F2_cross$gmap <- insert_pseudomarkers(map = tiny_F2_cross$gmap, step = 5)
 usethis::use_data(tiny_F2_cross)
 
-tiny_F2_map <- insert_pseudomarkers(map = tiny_F2_cross$gmap, step = 10)
-print(x = object.size(x = tiny_F2_map), units = 'Mb')
-
-tiny_F2_gp <- calc_genoprob(cross = tiny_F2_cross, map = tiny_F2_map, error_prob = 0.002)
+tiny_F2_gp <- calc_genoprob(cross = tiny_F2_cross, map = tiny_F2_cross$gmap, error_prob = 0.002)
 tiny_F2_ap <- genoprob_to_alleleprob(probs = tiny_F2_gp)
 print(x = object.size(x = tiny_F2_ap), units = 'Mb')
 usethis::use_data(tiny_F2_ap)
@@ -28,6 +27,7 @@ tiny_F2_s1v <- scan1var(pheno_name = 'liver',
 print(x = object.size(x = tiny_F2_s1v), units = 'Mb')
 usethis::use_data(tiny_F2_s1v)
 
+
 # get DO "cross" from qtl2data
 # accessed from commit 74baa4509a2671bc707cac560fc7cbf4ceb6c0c0
 DO_cross <- read_cross2(file = paste0('https://raw.githubusercontent.com/rqtl/',
@@ -37,13 +37,11 @@ print(x = object.size(x = DO_cross), units = 'Mb')
 
 tiny_DO_cross <- subset(x = DO_cross, chr = c('18', '19'), ind = 1:100)
 print(x = tiny_DO_cross)
+tiny_DO_cross$gmap <- insert_pseudomarkers(map = tiny_DO_cross$gmap, step = 10)
 print(x = object.size(x = tiny_DO_cross), units = 'Mb')
 usethis::use_data(tiny_DO_cross)
 
-tiny_DO_map <- insert_pseudomarkers(map = tiny_DO_cross$gmap, step = 10)
-print(x = object.size(x = tiny_DO_map), units = 'Mb')
-
-tiny_DO_gp <- calc_genoprob(cross = tiny_DO_cross, map = tiny_DO_map, error_prob = 0.002)
+tiny_DO_gp <- calc_genoprob(cross = tiny_DO_cross, map = tiny_DO_cross$gmap, error_prob = 0.002)
 tiny_DO_ap <- genoprob_to_alleleprob(probs = tiny_DO_gp)
 print(x = object.size(x = tiny_DO_ap), units = 'Mb')
 usethis::use_data(tiny_DO_ap)
