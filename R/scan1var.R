@@ -97,8 +97,8 @@ scan1var_onechr <- function(pheno_name,
 
   allele_names <- pull_allele_names(apr = alleleprobs)
 
-  mean_alt_formula <- make_formula(response_name = pheno_name, covar_names = c(allele_names[-1], mean_covar_names))
-  var_alt_formula <- make_formula(covar_names = c(allele_names[-1], var_covar_names))
+  mean_alt_formula <- make_formula(response_name = pheno_name, covar_names = c(allele_names, mean_covar_names))
+  var_alt_formula <- make_formula(covar_names = c(allele_names, var_covar_names))
   mean_null_formula <- make_formula(response_name = pheno_name, covar_names = mean_covar_names)
   var_null_formula <- make_formula(covar_names = var_covar_names)
 

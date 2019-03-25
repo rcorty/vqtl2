@@ -161,6 +161,9 @@ pull_marker_names <- function(apr) {
 make_formula <- function(response_name = NULL,
                          covar_names = '1') {
 
+  if (!identical(covar_names, '1'))
+    covar_names <- c('0', covar_names)
+
   stats::as.formula(
     paste(response_name,
           '~',
