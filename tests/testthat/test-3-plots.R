@@ -34,3 +34,24 @@ test_that(
     expect_is(object = DO_ae_plot, class = 'ggplot')
   }
 )
+
+
+test_that(
+  desc = 'plot_allele_effects_over_region',
+  code = {
+
+    F2_ae_plot <- plot_allele_effects_over_region(s1v = tiny_F2_s1v,
+                                                  cross = tiny_F2_cross,
+                                                  chr = '19')
+                                                  # start_marker = 'D18Mit20',
+                                                  # stop_marker = 'D18Mit186')
+
+    expect_is(object = F2_ae_plot, class = 'ggplot')
+
+    DO_ae_plot <- plot_allele_effects_over_region(s1v = tiny_DO_s1v,
+                                                  cross = tiny_DO_cross,
+                                                  chr = '18')
+
+    expect_is(object = DO_ae_plot, class = 'ggplot')
+  }
+)

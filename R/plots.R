@@ -14,13 +14,8 @@ plot_scan1var <- function(s1v,
 
   loc <- mvqtl_lr <- mqtl_lr <- vqtl_lr <- 'fake global for CRAN'
 
-  # combine gmap from cross with s1v to give each marker a location
-  tibble::tibble(
-    chr = rep(x = names(cross$gmap), times = sapply(X = cross$gmap, length)),
-    marker = unlist(x = sapply(X = cross$gmap, FUN = names), use.names = FALSE),
-    loc = unlist(x = cross$gmap, use.names = FALSE)
-  ) %>%
-    dplyr::inner_join(y = s1v, by = c('chr', 'marker')) ->
+  s1v %>%
+    insert_gmap_locs(gmap = cross$gmap) ->
     plotting_data
 
   # todo: check that size of plotting_data is correct
@@ -56,55 +51,94 @@ plot_allele_effects <- function(s1v,
                                 marker)
 {
 
-  input_marker <- marker
-  marker <- key <- value <- 'fake global for CRAN'
-  meanvar_estimse <- meanvar <- estimse <- 'fake global for CRAN'
-  mean_estim <- var_estim <- allele <- mean_se <- var_se <- 'fake global for CRAN'
+  mean_estim_cent <- var_estim_cent <- 'fake global for CRAN'
+  allele <- mean_se <- var_se <- 'fake global for CRAN'
 
-  purrr::cross(list(c('mean', 'var'),
-                    attr(x = s1v, which = 'alleles'),
-                    c('estim', 'se'))) %>%
-    purrr::map_chr(paste, collapse = '_') ->
-    allele_effect_names
-
-  s1v %>%
-    dplyr::filter(marker == input_marker) %>%
-    dplyr::select(dplyr::matches(paste(allele_effect_names, collapse = '|'))) %>%
-    tidyr::gather(key = key, value = value) %>%
-    tidyr::separate(col = 'key',
-                    sep = '_',
-                    into = c('meanvar', 'allele', 'estimse')) %>%
-    tidyr::unite(col = meanvar_estimse, meanvar, estimse) %>%
-    tidyr::spread(key = meanvar_estimse, value = value) ->
-    plotting_data
-
-  ggplot2::ggplot(data = plotting_data) +
+  pull_allele_effects(s1v = s1v, markers = marker) %>%
+    ggplot2::ggplot(mapping = ggplot2::aes(x = mean_estim_cent,
+                                           xend = mean_estim_cent,
+                                           y = var_estim_cent,
+                                           yend = var_estim_cent,
+                                           color = allele)) +
     ggplot2::geom_hline(yintercept = 0, color = 'darkgray') +
     ggplot2::geom_vline(xintercept = 0, color = 'darkgray') +
-    ggplot2::geom_point(mapping = ggplot2::aes(x = mean_estim, y = var_estim, color = allele),
-                        size = 2) +
-    ggplot2::geom_segment(mapping = ggplot2::aes(x = mean_estim - mean_se,
-                                                 xend = mean_estim + mean_se,
-                                                 y = var_estim,
-                                                 yend = var_estim,
-                                                 color = allele),
+    ggplot2::geom_segment(mapping = ggplot2::aes(x = mean_estim_cent - mean_se,
+                                                 xend = mean_estim_cent + mean_se),
                           size = 2,
                           alpha = 0.5) +
-    ggplot2::geom_segment(mapping = ggplot2::aes(x = mean_estim,
-                                                 xend = mean_estim,
-                                                 y = var_estim - var_se,
-                                                 yend = var_estim + var_se,
-                                                 color = allele),
+    ggplot2::geom_segment(mapping = ggplot2::aes(y = var_estim_cent - var_se,
+                                                 yend = var_estim_cent + var_se),
                           size = 2,
                           alpha = 0.5) +
+    ggplot2::geom_point(size = 3) +
     ggplot2::theme_minimal() +
+    {
+      if (identical(attr(x = s1v, which = 'alleles'), LETTERS[1:8]))
+        ggplot2::scale_color_manual(values = cc_colors)
+    } +
     ggplot2::xlab(label = 'mean effects') +
     ggplot2::ylab(label = 'variance effects') +
     ggplot2::ggtitle(label = paste('Allele effects on',
                                    attr(x = s1v, which = 'pheno_name'),
                                    'at',
                                    marker))
-
-
 }
 
+
+#' @title plot allele effects over a region
+#'
+#' @param s1v temp
+#' @param cross temp
+#' @param chr temp
+#'
+#' @return the plot
+#' @export
+#'
+#' @importFrom dplyr %>%
+#'
+plot_allele_effects_over_region <- function(s1v,
+                                            cross,
+                                            # start_marker = NULL,
+                                            # stop_marker = NULL,
+                                            chr = NULL)
+{
+
+  `.` <- marker <- loc <- allele <- 'fake global for CRAN'
+  mean_estim_cent <- var_estim_cent <- 'fake global for CRAN'
+  meanvar <- estim <- 'fake global for CRAN'
+
+  input_chr <- chr
+
+  # s1v %>%
+  #   cond_filter(chr == input_chr,
+  #               execute = !is.null(input_chr)) %>%
+  #   cond_slice(seq.int(from = which(marker == start_marker),
+  #                      to = which(marker == stop_marker)),
+  #              execute = is.null(input_chr))
+
+  s1v %>%
+    dplyr::pull(marker) %>%
+    `[`(-1) %>%
+    pull_allele_effects(s1v = s1v, markers = .) %>%
+    dplyr::mutate(chr = input_chr) %>%
+    insert_gmap_locs(gmap = cross$gmap) %>%
+    dplyr::select(loc, allele, mean_estim_cent, var_estim_cent) %>%
+    tidyr::gather(key = meanvar, value = estim, mean_estim_cent, var_estim_cent) %>%
+    dplyr::mutate(meanvar = dplyr::case_when(
+      meanvar == 'mean_estim_cent' ~ 'mean',
+      meanvar == 'var_estim_cent' ~ 'var')) %>%
+    ggplot2::ggplot(mapping = ggplot2::aes(x = loc, color = allele)) +
+    ggplot2::geom_hline(yintercept = 0, color = 'darkgray') +
+    ggplot2::geom_line(mapping = ggplot2::aes(y = estim, linetype = meanvar)) +
+    # ggplot2::geom_line(mapping = ggplot2::aes(y = var_estim_cent)) +
+    ggplot2::theme_minimal() +
+    {
+      if (identical(attr(x = s1v, which = 'alleles'), LETTERS[1:8]))
+        ggplot2::scale_color_manual(values = cc_colors)
+    } +
+    ggplot2::labs(title = 'temporary title',
+                  x = 'location',
+                  y = 'effect',
+                  color = 'allele',
+                  linetype = 'effect type')
+}

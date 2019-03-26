@@ -1,4 +1,3 @@
-
 tryNA <- function(expr) {
   suppressWarnings(tryCatch(expr = expr,
                             error = function(e) NA,
@@ -67,17 +66,14 @@ log_lik <- function(f) {
 
 LRT <- function(alt, null) {
 
-  if (any(is.null(alt), is.null(null))) {
+  if (any(is.null(alt), is.null(null)))
     return(NA)
-  }
 
-  if (!identical(class(alt), class(null))) {
+  if (!identical(class(alt), class(null)))
     stop('Can only calculate LOD on models of the same class.')
-  }
 
-  if (!inherits(x = alt, what = c('dglm', 'hglm'))) {
+  if (!inherits(x = alt, what = c('dglm', 'hglm')))
     stop('Can only calcualte LOD on models of class dglm or hglm.')
-  }
 
   LRT <- 2*(log_lik(alt) - log_lik(null))
 
@@ -94,7 +90,6 @@ LOD_from_LLs <- function(null_ll, alt_ll) {
 LRT_from_LLs <- function(null_ll, alt_ll) {
   return(2*(alt_ll - null_ll))
 }
-
 
 dof <- function(f) {
 
@@ -146,8 +141,10 @@ conditionally <- function(fun){
 cond_filter <- conditionally(dplyr::filter)
 cond_select <- conditionally(dplyr::select)
 cond_mutate <- conditionally(dplyr::mutate)
+cond_slice <- conditionally(dplyr::slice)
 
-pull_effects <- function(model, which_submodel = c('mean', 'var', 'both')) {
+pull_effects <- function(model,
+                         which_submodel = c('mean', 'var', 'both')) {
 
   term <- estimate <- std.error <- 'fake global for CRAN'
   measure <- val <- united <- 'fake global for CRAN'
@@ -157,8 +154,10 @@ pull_effects <- function(model, which_submodel = c('mean', 'var', 'both')) {
   which_submodel <- match.arg(arg = which_submodel)
   if (which_submodel == 'var') { model <- model$dispersion.fit }
   if (which_submodel == 'both') {
-    dplyr::bind_cols(pull_effects(model = model, which_submodel = 'mean'),
-                     pull_effects(model = model, which_submodel = 'var'))
+    return(
+      dplyr::bind_cols(pull_effects(model = model, which_submodel = 'mean'),
+                       pull_effects(model = model, which_submodel = 'var'))
+    )
   }
 
   model %>%
@@ -173,4 +172,72 @@ pull_effects <- function(model, which_submodel = c('mean', 'var', 'both')) {
                                              measure == 'std.error' ~ 'se')) %>%
     tidyr::unite(col = 'united', term, measure) %>%
     tidyr::spread(key = united, value = val)
+}
+
+pull_allele_effects <- function(s1v, markers) {
+
+  `.` <- marker <- key <- value <- 'fake global for CRAN'
+  meanvar_estimse <- meanvar <- estimse <- 'fake global for CRAN'
+  mean_estim <- var_estim <- 'fake global for CRAN'
+
+  input_markers <- markers
+
+  cross_w_meanvar_and_estimse <- function(v) {
+    purrr::cross(list(c('mean', 'var'),
+                      v,
+                      c('estim', 'se'))) %>%
+      purrr::map_chr(paste, collapse = '_')
+  }
+
+  alleles <- attr(x = s1v, which = 'alleles')
+  first_allele_names <- cross_w_meanvar_and_estimse(alleles[1])
+  other_allele_names <- cross_w_meanvar_and_estimse(alleles[-1])
+  regex_for_oafn <- paste(other_allele_names, collapse = '|')
+
+  s1v %>%
+    dplyr::filter(marker %in% input_markers) %>%
+    dplyr::select(dplyr::matches('marker'),
+                  dplyr::matches('loc'),
+                  dplyr::matches(regex_for_oafn)) %>%
+    tidyr::gather(key = key, value = value, dplyr::matches(regex_for_oafn)) %>%
+    dplyr::bind_rows(
+      tibble::tibble(marker = rep(x = markers, each = 4),
+                     key = rep(x = first_allele_names, times = length(markers)),
+                     value = 0),
+      .
+    ) %>%
+    tidyr::separate(col = 'key',
+                    sep = '_',
+                    into = c('meanvar', 'allele', 'estimse')) %>%
+    tidyr::unite(col = meanvar_estimse, meanvar, estimse) %>%
+    tidyr::spread(key = meanvar_estimse, value = value) %>%
+    dplyr::group_by(marker) %>%
+    dplyr::mutate(mean_estim_cent = center(x = mean_estim),
+                  var_estim_cent = center(x = var_estim))
+}
+
+center <- function(x) {
+  x - mean(x)
+}
+
+cc_colors <- c(
+  grDevices::rgb(red = 240, green = 240, blue = 000, maxColorValue = 255),
+  grDevices::rgb(red = 128, green = 128, blue = 128, maxColorValue = 255),
+  grDevices::rgb(red = 240, green = 128, blue = 128, maxColorValue = 255),
+  grDevices::rgb(red = 016, green = 016, blue = 240, maxColorValue = 255),
+  grDevices::rgb(red = 000, green = 160, blue = 240, maxColorValue = 255),
+  grDevices::rgb(red = 000, green = 160, blue = 000, maxColorValue = 255),
+  grDevices::rgb(red = 240, green = 000, blue = 000, maxColorValue = 255),
+  grDevices::rgb(red = 144, green = 000, blue = 224, maxColorValue = 255)
+)
+
+insert_gmap_locs <- function(s1v, gmap) {
+
+  tibble::tibble(
+    chr = rep(x = names(gmap), times = sapply(X = gmap, length)),
+    marker = unlist(x = sapply(X = gmap, FUN = names), use.names = FALSE),
+    loc = unlist(x = gmap, use.names = FALSE)
+  ) %>%
+    dplyr::inner_join(y = s1v, by = c('chr', 'marker'))
+
 }

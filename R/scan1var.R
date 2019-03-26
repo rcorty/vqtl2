@@ -79,6 +79,7 @@ scan1var <- function(pheno_name,
     pull_effects(model = null_fit, which_submodel = 'var')
   ) %>%
     dplyr::bind_rows(result) %>%
+    # dplyr::mutate(marker = factor(x = marker, levels = marker)) %>%
     add_attribute(which = 'pheno_name', value = pheno_name) %>%
     add_attribute(which = 'mean_covar_names', value = mean_covar_names) %>%
     add_attribute(which = 'var_covar_names', value = var_covar_names) %>%
@@ -130,7 +131,7 @@ scan1var_onechr <- function(pheno_name,
       null_fit = null_fit)
   }
 
-  return(dplyr::bind_rows(results))
+  dplyr::bind_rows(results)
 
 }
 
@@ -155,8 +156,6 @@ scan1var_onelocus <- function(marker_name,
                vf = formulae$var_alt,
                locus_data = locus_data,
                family = family)
-
-  # if (is.null(mv)) { browser() }
 
   tibble::tibble(marker = marker_name,
                  mvqtl_lr = LRT(alt = mv, null = null_fit),
