@@ -41,7 +41,8 @@ scan1var <- function(pheno_name,
 
   # fit model with no genetic information (covariates only)
   # this will be the null model for all mvQTL tests
-  null_fit <- fit_dglm(mf = make_formula(response_name = pheno_name, covar_names = mean_covar_names),
+  null_fit <- fit_dglm(mf = make_formula(response_name = pheno_name,
+                                         covar_names = mean_covar_names),
                        vf = make_formula(covar_names = var_covar_names),
                        locus_data = non_genetic_data,
                        family = family,
@@ -97,15 +98,22 @@ scan1var_onechr <- function(pheno_name,
 
   allele_names <- pull_allele_names(apr = alleleprobs)
 
-  mean_alt_formula <- make_formula(response_name = pheno_name, covar_names = c(allele_names[-1], mean_covar_names))
-  var_alt_formula <- make_formula(covar_names = c(allele_names[-1], var_covar_names))
-  mean_null_formula <- make_formula(response_name = pheno_name, covar_names = mean_covar_names)
-  var_null_formula <- make_formula(covar_names = var_covar_names)
-
-  formulae <- list(mean_alt = mean_alt_formula,
-                   var_alt = var_alt_formula,
-                   mean_null = mean_null_formula,
-                   var_null = var_null_formula)
+  formulae <- list(
+    mean_alt = make_formula(
+      response_name = pheno_name,
+      covar_names = c(allele_names[-1], mean_covar_names)
+    ),
+    mean_null = make_formula(
+      response_name = pheno_name,
+      covar_names = mean_covar_names
+    ),
+    var_alt = make_formula(
+      covar_names = c(allele_names[-1], var_covar_names)
+    ),
+    var_null = make_formula(
+      covar_names = var_covar_names
+    )
+  )
 
   marker_names <- pull_marker_names(apr = alleleprobs)
 
@@ -157,8 +165,7 @@ scan1var_onelocus <- function(marker_name,
                  mqtl_dof = dof(f = mv) - dof(v),
                  vqtl_lr = LRT(alt = mv, null = m),
                  vqtl_dof = dof(f = mv) - dof(m)) %>%
-    dplyr::bind_cols(pull_effects(model = mv, which_submodel = 'mean')) %>%
-    dplyr::bind_cols(pull_effects(model = mv, which_submodel = 'var'))
+    dplyr::bind_cols(pull_effects(model = mv, which_submodel = 'both'))
 }
 
 

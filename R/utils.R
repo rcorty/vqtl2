@@ -192,16 +192,19 @@ cond_filter <- conditionally(dplyr::filter)
 cond_select <- conditionally(dplyr::select)
 cond_mutate <- conditionally(dplyr::mutate)
 
-pull_effects <- function(model, which_submodel = c('mean', 'var')) {
+pull_effects <- function(model, which_submodel = c('mean', 'var', 'both')) {
 
   term <- estimate <- std.error <- 'fake global for CRAN'
   measure <- val <- united <- 'fake global for CRAN'
 
-  which_submodel <- match.arg(arg = which_submodel)
-
   if (is.null(model)) { return(tibble::tibble()) }
 
+  which_submodel <- match.arg(arg = which_submodel)
   if (which_submodel == 'var') { model <- model$dispersion.fit }
+  if (which_submodel == 'both') {
+    dplyr::bind_cols(pull_effects(model = model, which_submodel = 'mean'),
+                     pull_effects(model = model, which_submodel = 'var'))
+  }
 
   model %>%
     broom::tidy() %>%
