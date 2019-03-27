@@ -4,12 +4,12 @@
 \alias{plot_scan1var}
 \title{Plot scan1var}
 \usage{
-plot_scan1var(s1v, cross)
+plot_scan1var(s1v, genetic_map)
 }
 \arguments{
 \item{s1v}{the scan1var object to be plotted}
 
-\item{cross}{the cross object}
+\item{genetic_map}{the map giving he location of each marker}
 }
 \value{
 the plot

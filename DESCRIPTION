@@ -10,7 +10,8 @@ Description: Update to package 'vqtl' as described
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.3.0)
+Depends: 
+    R (>= 3.3.0)
 Suggests: 
     testthat,
     covr
@@ -18,6 +19,7 @@ RoxygenNote: 6.1.1
 Imports: 
     qtl2,
     dplyr,
+    ggplot2,
     tibble,
     dglm,
     parallel,
@@ -25,6 +27,5 @@ Imports:
     foreach,
     broom,
     tidyr,
-    ggplot2,
     purrr
 Remotes: rqtl/qtl2

@@ -1,39 +1,45 @@
 #' @title Plot scan1var
 #'
 #' @param s1v the scan1var object to be plotted
-#' @param cross the cross object
+#' @param genetic_map the map giving he location of each marker
 #'
 #' @return the plot
+#'
 #' @export
+#' @import ggplot2
+#' @import dplyr
 #' @importFrom dplyr %>%
-#' @importFrom ggplot2 aes
+#' @importFrom tidyr gather
 #'
 plot_scan1var <- function(s1v,
-                          cross)
+                          genetic_map)
 {
 
   loc <- mvqtl_lr <- mqtl_lr <- vqtl_lr <- 'fake global for CRAN'
+  chr <- qtl_type <- lr <- 'fake global for CRAN'
 
-  s1v %>%
-    insert_gmap_locs(gmap = cross$gmap) ->
-    plotting_data
+  stopifnot(is_scan1var(s1v))
 
-  # todo: check that size of plotting_data is correct
-  # ie only dropped one row from s1v (the null fit row)
-  # and didn't drop any markers from cross$gmap
-
-  plotting_data %>%
-    ggplot2::ggplot(mapping = aes(x = loc)) +
-    ggplot2::geom_line(mapping = aes(y = mvqtl_lr), color = 'black') +
-    ggplot2::geom_line(mapping = aes(y = mqtl_lr), color = 'blue') +
-    ggplot2::geom_line(mapping = aes(y = vqtl_lr), color = 'red') +
-    ggplot2::facet_grid(rows = ~ chr, space = 'free_x', switch = 'x') +
-    ggplot2::ylab('likelihood ratio') +
-    ggplot2::ggtitle(label = paste('scan1var:', attr(x = s1v, which = 'pheno_name'))) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(strip.placement = 'outside',
-                   strip.background = ggplot2::element_rect(fill = 'lightgray', color = NA),
-                   axis.title.x = ggplot2::element_blank())
+  join_s1v_gmap(s1v = s1v,
+                gmap = genetic_map) %>%
+    select(chr, loc, matches('_lr')) %>%
+    gather(key = qtl_type, value = lr, matches('_lr')) %>%
+    mutate(qtl_type = factor(x = qtl_type,
+                             levels = c('mvqtl_lr', 'mqtl_lr', 'vqtl_lr'),
+                             labels = c('mvQTL', 'mQTL', 'vQTL'))) %>%
+    ggplot(mapping = aes(x = loc)) +
+    geom_line(mapping = aes(y = lr, color = qtl_type), size = 1) +
+    facet_grid(cols = vars(chr),
+               scales = 'free_x',
+               space = 'free_x',
+               switch = 'x',
+               labeller = label_both) +
+    scale_color_manual(values = c('black', 'blue', 'red'),
+                       guide = guide_legend(title = 'QTL type')) +
+    labs(title = paste('scan1var:', attr(x = s1v, which = 'pheno_name')),
+         y = 'likelihood ratio') +
+    theme_vqtl2() +
+    theme(axis.title.x = element_blank())
 
 }
 
@@ -44,7 +50,9 @@ plot_scan1var <- function(s1v,
 #' @param marker the marker at which the allele effects will be plotted
 #'
 #' @return the plot
+#'
 #' @export
+#' @import ggplot2
 #' @importFrom dplyr %>%
 #'
 plot_allele_effects <- function(s1v,
@@ -54,91 +62,96 @@ plot_allele_effects <- function(s1v,
   mean_estim_cent <- var_estim_cent <- 'fake global for CRAN'
   allele <- mean_se <- var_se <- 'fake global for CRAN'
 
-  pull_allele_effects(s1v = s1v, markers = marker) %>%
-    ggplot2::ggplot(mapping = ggplot2::aes(x = mean_estim_cent,
-                                           xend = mean_estim_cent,
-                                           y = var_estim_cent,
-                                           yend = var_estim_cent,
-                                           color = allele)) +
-    ggplot2::geom_hline(yintercept = 0, color = 'darkgray') +
-    ggplot2::geom_vline(xintercept = 0, color = 'darkgray') +
-    ggplot2::geom_segment(mapping = ggplot2::aes(x = mean_estim_cent - mean_se,
-                                                 xend = mean_estim_cent + mean_se),
-                          size = 2,
-                          alpha = 0.5) +
-    ggplot2::geom_segment(mapping = ggplot2::aes(y = var_estim_cent - var_se,
-                                                 yend = var_estim_cent + var_se),
-                          size = 2,
-                          alpha = 0.5) +
-    ggplot2::geom_point(size = 3) +
-    ggplot2::theme_minimal() +
+  stopifnot(is_scan1var(s1v))
+  stopifnot(length(marker) == 1)
+
+  compute_allele_effects(s1v = s1v, markers = marker) %>%
+    ggplot(mapping = aes(x = mean_estim_cent,
+                         xend = mean_estim_cent,
+                         y = var_estim_cent,
+                         yend = var_estim_cent,
+                         color = allele)) +
+    geom_hline(yintercept = 0, color = 'darkgray') +
+    geom_vline(xintercept = 0, color = 'darkgray') +
+    geom_segment(mapping = aes(x = mean_estim_cent - mean_se,
+                               xend = mean_estim_cent + mean_se),
+                 size = 2,
+                 alpha = 0.8,
+                 lineend = 'round') +
+    geom_segment(mapping = aes(y = var_estim_cent - var_se,
+                               yend = var_estim_cent + var_se),
+                 size = 2,
+                 alpha = 0.8,
+                 lineend = 'round') +
+    geom_point(size = 4, color = 'black') +
+    geom_point(size = 3) +
     {
       if (identical(attr(x = s1v, which = 'alleles'), LETTERS[1:8]))
-        ggplot2::scale_color_manual(values = cc_colors)
+        scale_color_manual(values = cc_colors)
     } +
-    ggplot2::xlab(label = 'mean effects') +
-    ggplot2::ylab(label = 'variance effects') +
-    ggplot2::ggtitle(label = paste('Allele effects on',
-                                   attr(x = s1v, which = 'pheno_name'),
-                                   'at',
-                                   marker))
+    labs(title = paste('Allele effects on',
+                       attr(x = s1v, which = 'pheno_name'),
+                       'at',
+                       marker),
+         x = 'mean effects',
+         y = 'variance effects') +
+    theme_vqtl2()
 }
 
 
 #' @title plot allele effects over a region
 #'
 #' @param s1v temp
-#' @param cross temp
+#' @param genetic_map temp
 #' @param chr temp
 #'
 #' @return the plot
+
 #' @export
+#' @import ggplot2
+#' @importFrom dplyr %>% mutate select pull case_when
+#' @importFrom tidyr gather
 #'
-#' @importFrom dplyr %>%
-#'
-plot_allele_effects_over_region <- function(s1v,
-                                            cross,
-                                            # start_marker = NULL,
-                                            # stop_marker = NULL,
-                                            chr = NULL)
+plot_allele_effects_scan <- function(s1v,
+                                     genetic_map,
+                                     # start_marker = NULL,
+                                     # stop_marker = NULL,
+                                     chr = NULL)
 {
 
   `.` <- marker <- loc <- allele <- 'fake global for CRAN'
   mean_estim_cent <- var_estim_cent <- 'fake global for CRAN'
   meanvar <- estim <- 'fake global for CRAN'
 
-  input_chr <- chr
+  input_chr <- as.character(x = chr)
 
-  # s1v %>%
-  #   cond_filter(chr == input_chr,
-  #               execute = !is.null(input_chr)) %>%
-  #   cond_slice(seq.int(from = which(marker == start_marker),
-  #                      to = which(marker == stop_marker)),
-  #              execute = is.null(input_chr))
+  # would be better to filter first, but join_s1v_gmap()
+  # can't handle that at present...todo
 
   s1v %>%
-    dplyr::pull(marker) %>%
+    pull(marker) %>%
     `[`(-1) %>%
-    pull_allele_effects(s1v = s1v, markers = .) %>%
-    dplyr::mutate(chr = input_chr) %>%
-    insert_gmap_locs(gmap = cross$gmap) %>%
-    dplyr::select(loc, allele, mean_estim_cent, var_estim_cent) %>%
-    tidyr::gather(key = meanvar, value = estim, mean_estim_cent, var_estim_cent) %>%
-    dplyr::mutate(meanvar = dplyr::case_when(
+    compute_allele_effects(s1v = s1v, markers = .) %>%
+    mutate(chr = input_chr) %>%
+    join_s1v_gmap(gmap = genetic_map) %>%
+    select(loc, allele, mean_estim_cent, var_estim_cent) %>%
+    gather(key = meanvar, value = estim, mean_estim_cent, var_estim_cent) %>%
+    mutate(meanvar = case_when(
       meanvar == 'mean_estim_cent' ~ 'mean',
-      meanvar == 'var_estim_cent' ~ 'var')) %>%
-    ggplot2::ggplot(mapping = ggplot2::aes(x = loc, color = allele)) +
-    ggplot2::geom_hline(yintercept = 0, color = 'darkgray') +
-    ggplot2::geom_line(mapping = ggplot2::aes(y = estim, linetype = meanvar)) +
-    # ggplot2::geom_line(mapping = ggplot2::aes(y = var_estim_cent)) +
-    ggplot2::theme_minimal() +
+      meanvar == 'var_estim_cent' ~ 'variance')) %>%
+    ggplot(mapping = aes(x = loc, color = allele)) +
+    geom_hline(yintercept = 0, color = 'darkgray') +
+    geom_line(mapping = aes(y = estim), size = 1) +
+    facet_grid(rows = vars(meanvar), scales = 'free_y') +
     {
       if (identical(attr(x = s1v, which = 'alleles'), LETTERS[1:8]))
-        ggplot2::scale_color_manual(values = cc_colors)
+        scale_color_manual(values = cc_colors)
     } +
-    ggplot2::labs(title = 'temporary title',
-                  x = 'location',
-                  y = 'effect',
-                  color = 'allele',
-                  linetype = 'effect type')
+    labs(title = paste('Chromosome', input_chr,
+                       'allele effects on',
+                       attr(x = s1v, which = 'pheno_name')),
+         x = 'location',
+         y = NULL,
+         color = 'allele') +
+    theme_vqtl2()
 }

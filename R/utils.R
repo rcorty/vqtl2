@@ -174,7 +174,7 @@ pull_effects <- function(model,
     tidyr::spread(key = united, value = val)
 }
 
-pull_allele_effects <- function(s1v, markers) {
+compute_allele_effects <- function(s1v, markers) {
 
   `.` <- marker <- key <- value <- 'fake global for CRAN'
   meanvar_estimse <- meanvar <- estimse <- 'fake global for CRAN'
@@ -231,7 +231,7 @@ cc_colors <- c(
   grDevices::rgb(red = 144, green = 000, blue = 224, maxColorValue = 255)
 )
 
-insert_gmap_locs <- function(s1v, gmap) {
+join_s1v_gmap <- function(s1v, gmap) {
 
   tibble::tibble(
     chr = rep(x = names(gmap), times = sapply(X = gmap, length)),
@@ -240,4 +240,18 @@ insert_gmap_locs <- function(s1v, gmap) {
   ) %>%
     dplyr::inner_join(y = s1v, by = c('chr', 'marker'))
 
+}
+
+
+
+theme_vqtl2 <- function() {
+  theme_minimal() +
+    theme(panel.background = element_rect(fill = '#DDDDDD', color = NA),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(color = '#BBBBBB'),
+          strip.placement = 'outside',
+          strip.background = element_rect(fill = '#DDDDDD',
+                                          color = NA),
+          plot.title = element_text(size = 16,
+                                    family = 'Ubuntu'))
 }
