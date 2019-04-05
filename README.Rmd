@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -15,8 +17,8 @@ knitr::opts_chunk$set(
 
 # vqtl2 <a href='https://rcorty.github.io/vqtl2/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
-[![Travis build status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2)
-[![Coverage status](https://codecov.io/gh/rcorty/vqtl2/branch/master/graph/badge.svg)](https://codecov.io/github/rcorty/vqtl2?branch=master)
+<!-- [![Travis build status](https://travis-ci.org/rcorty/vqtl2.svg?branch=master)](https://travis-ci.org/rcorty/vqtl2) -->
+<!-- [![Coverage status](https://codecov.io/gh/rcorty/vqtl2/branch/master/graph/badge.svg)](https://codecov.io/github/rcorty/vqtl2?branch=master) -->
 
 ## Overview
 
@@ -48,11 +50,37 @@ install.packages('devtools')
 devtools::install_github(repo = 'rcorty/vqtl2')
 ```
 
-## Usage
+## Usage (incomplete)
 
-```{r, message = FALSE}
+```{r, message = FALSE, eval=FALSE}
+library(qtl2)
 library(vqtl2)
-# todo
+
+# read in cross per qtl2
+# my_DO_cross <- read_cross2(file = 'path_to_my_cross')
+
+my_s1v <- scan1var(pheno_name = 'WBC',
+                   mean_covar_names = c('NEUT', 'Sex'),
+                   var_covar_names = c('Sex', 'Batch'),
+                   alleleprobs = tiny_DO_ap,
+                   non_genetic_data = cbind(tiny_DO_cross$pheno,
+                                            tiny_DO_cross$covar))
+
+# simplest call -- uses lots of defaults
+# need to change the plot function to use generic?
+plot_scan1var(s1v = my_s1v, genetic_map = tiny_DO_cross$gmap)
+# what = 'association', stat = empirical_p if available, LR otherwise
+# meanorvar = 'both'
+
+# here we get allele effects on mean and variance
+plot(x = my_s1v, what = 'allele_effects')
+
+# here we get covariate effects on mean and variance
+plot(x = my_s1v, what = c('covar_effects'))
+
+# this plotting function uses ggplot2, so you can change it before you "render"
+plot(x = my_s1v) + geom_hline(yintercept = 2) + theme_dark()
+
 ```
 
 ## Getting help
