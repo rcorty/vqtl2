@@ -4,14 +4,14 @@ test_that(
   desc = 'plot_scan1var',
   code = {
 
-    F2_plot <- plot_scan1var(s1v = tiny_F2_s1v,
-                             genetic_map = tiny_F2_cross$gmap)
+    F2_plot <- plot(x = tiny_F2_s1v,
+                    genetic_map = tiny_F2_cross$gmap)
 
     expect_is(object = F2_plot, class = 'ggplot')
 
 
-    DO_plot <- plot_scan1var(s1v = tiny_DO_s1v,
-                             genetic_map = tiny_DO_cross$gmap)
+    DO_plot <- plot(x = tiny_DO_s1v,
+                    genetic_map = tiny_DO_cross$gmap)
 
     expect_is(object = DO_plot, class = 'ggplot')
   }

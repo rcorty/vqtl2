@@ -1,3 +1,31 @@
+plot.scan1var <- function(x,
+                          genetic_map,
+                          what = c('association', 'effects'),
+                          association = c('LR', 'LOD', 'asymptotic_p', 'empirical_p'),
+                          effects = c('alleles', 'covariates', 'both')) {
+  stopifnot(is_scan1var(x))
+  stopifnot(is_genetic_map(geneti_map))
+
+  what <- match.arg(arg = what)
+
+  # should unite gmap and x here, since both the next
+  # calls will need to do it
+
+  switch(EXPR = what,
+         'association' = plot_scan1var_assoc(
+           yada,
+           yada,
+           what = match.arg(association)
+         ),
+         'effects' = plot_scan1var_effects(
+           yada,
+           yada,
+           what = match.arg(effects)
+         )
+  )
+}
+
+
 #' @title Plot scan1var
 #'
 #' @param s1v the scan1var object to be plotted
@@ -11,14 +39,12 @@
 #' @importFrom dplyr %>%
 #' @importFrom tidyr gather
 #'
-plot_scan1var <- function(s1v,
-                          genetic_map)
+plot_scan1var_assoc <- function(s1v,
+                                gmap)
 {
 
   loc <- mvqtl_lr <- mqtl_lr <- vqtl_lr <- 'fake global for CRAN'
   chr <- qtl_type <- lr <- 'fake global for CRAN'
-
-  stopifnot(is_scan1var(s1v))
 
   join_s1v_gmap(s1v = s1v,
                 gmap = genetic_map) %>%
@@ -112,11 +138,11 @@ plot_allele_effects <- function(s1v,
 #' @importFrom dplyr %>% mutate select pull case_when
 #' @importFrom tidyr gather
 #'
-plot_allele_effects_scan <- function(s1v,
-                                     genetic_map,
-                                     # start_marker = NULL,
-                                     # stop_marker = NULL,
-                                     chr = NULL)
+plot_scan1var_effects <- function(s1v,
+                                  genetic_map,
+                                  # start_marker = NULL,
+                                  # stop_marker = NULL,
+                                  chr = NULL)
 {
 
   `.` <- marker <- loc <- allele <- 'fake global for CRAN'

@@ -246,7 +246,7 @@ join_s1v_gmap <- function(s1v, gmap) {
 
 theme_vqtl2 <- function() {
   theme_minimal() +
-    theme(panel.background = element_rect(fill = '#DDDDDD', color = NA),
+    theme(panel.background = element_rect(fill = '#DDDDDD', color = 'black'),
           panel.grid.minor = element_blank(),
           panel.grid.major = element_line(color = '#BBBBBB'),
           strip.placement = 'outside',
